@@ -1,5 +1,5 @@
 import { boolean, z } from "zod";
-import { userSchema } from "./validation";
+import { userSchema } from "./zodValidation";
 
 
 interface UserRegister{

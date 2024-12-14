@@ -23,40 +23,44 @@ class AuthController{
                 
                 const salt = await bcrypt.genSalt(10);
                 const hashedPassword = await bcrypt.hash(password, salt);
-
-                try{
-                    
-                    const findUser = await prisma.people.findFirst({
-                        where:{
-                            email
-                        }
-                    })
-
-                    if(findUser){
-                        res.status(422).json({
-                            message: "User exists. please Login"
-                        })
-                        return;
+                
+                const findUser = await prisma.people.findFirst({
+                    where:{
+                        email
                     }
+                })
 
-                    const user = await prisma.people.create({
-                        data: {
-                            name,
-                            email,
-                            password: hashedPassword
-                        }
+                if(findUser){
+                    res.status(422).json({
+                        message: "User exists. please Login"
                     })
-
-                }catch(error){
-                    console.error("errror in creating a user");
+                    return;
                 }
+
+                const user = await prisma.people.create({
+                    data: {
+                        name,
+                        email,
+                        password: hashedPassword
+                    }
+                })
+
+                // console.log(user.id);
+                const payload  = {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    profile: user?.profile
+                }
+
+                const token = jwt.sign(payload, process.env.JWT_SECRET || "");
         
                 res.status(200).json({
-                    name,
-                    email,
-                    hashedPassword
+                    message: "Register Successful",
+                    token: `Bearer ${token}`
                 })
                 return;
+                
             }
 
         }catch(error){
@@ -103,7 +107,7 @@ class AuthController{
                 id: findUser.id,
                 name: findUser.name,
                 email: findUser.email,
-                profile: findUser.profile
+                profile: findUser?.profile
             }
             
             // console.log(`secret is ${process.env.JWT_SECRET}`);
