@@ -21,6 +21,9 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
         
         //@ts-ignore
         req.user = user;
+        //@ts-ignore
+        // console.log(req.user);
+        
         next();
     })
 

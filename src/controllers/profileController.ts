@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { generateRandomNumber, imageValidator } from "../validations/imgValidation";
-import { UploadedFile } from "express-fileupload";
+import { imageValidation } from "../utils/imgConfig";
 import { prisma } from "../db";
-import path from "path";
 
 export class ProfileController{
 
@@ -38,37 +36,23 @@ export class ProfileController{
 
             if (Array.isArray(profile)) {
                 res.status(400).json({
-                    message: "Only one profile picture is allowed"
-                });
-                return;
-            }
-
-            const message = imageValidator((profile.size), profile.mimetype);
-
-            if(message !== null){
-                res.status(400).json({
-                    error: message
+                    error: "Only 1 Image is required"
                 })
                 return;
             }
             
-            const imgName = profile.name;
-            const extension = imgName.split(".");
-            const newImageName = generateRandomNumber() + "." + extension[1];
+            const imageFunction = imageValidation(profile);
 
-            const uploadPath = path.join(process.cwd(), 'src', 'public', 'images', newImageName);
-
-
-            console.log(uploadPath);
-
-
-            profile.mv(uploadPath, (error) => {
-                console.error(error);
-            })
+            if(!imageFunction.success){
+                res.status(400).json({
+                    error: imageFunction.message
+                })
+                return;
+            }
 
             await prisma.people.update({
                 data: {
-                    profile: newImageName
+                    profile: imageFunction.message
                 },
                 where: {
                     id: Number(id)

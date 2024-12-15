@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ValidateRegister } from "../validations/errorHandling";
+import { ValidateRegister } from "../utils/errorHandling";
 import bcrypt from "bcrypt";
 import { prisma } from "../db";
 import jwt from "jsonwebtoken";
