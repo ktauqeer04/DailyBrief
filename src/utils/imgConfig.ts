@@ -1,8 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import { UploadedFile } from "express-fileupload";
+import fs from "fs";
 
-export const imageValidation = (image: UploadedFile) => {
+export const imageValidationAndUpload = (image: UploadedFile) => {
 
     const imgSizeValidation = imageValidator(image.size, image.mimetype);
     
@@ -18,11 +19,11 @@ export const imageValidation = (image: UploadedFile) => {
     const newImageName = generateRandomNumber() + "." + extension[1];
     const uploadPath = path.join(process.cwd(), 'src', 'public', 'images', newImageName);
     
-    console.log(uploadPath);
+    // console.log(uploadPath);
     
     image.mv(uploadPath, (error) => {
         if(error){
-            console.error(error);      
+            console.error(error);       
         }
     })
 
@@ -72,3 +73,14 @@ export const defautlImageURL = (imageName : string) => {
     const URL = process.env.DEV_URL || "";
     return `${URL}/public/${imageName}`;
 }
+
+export const removeImage = (imageName: string) => {
+    const imagePath = path.join(process.cwd(), 'src', 'public', 'images', imageName);
+    fs.unlink(imagePath, (error) => {
+        if(error){
+            console.error(error);
+            return;
+        }
+    })
+}
+

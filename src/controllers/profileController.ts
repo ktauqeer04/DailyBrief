@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { imageValidation } from "../utils/imgConfig";
+import { imageValidationAndUpload } from "../utils/imgConfig";
 import { prisma } from "../db";
 
 export class ProfileController{
 
-    static async index(req: Request, res: Response){
+    static async fetch(req: Request, res: Response){
 
     }
 
@@ -12,7 +12,7 @@ export class ProfileController{
 
     }
 
-    static async fetch(req: Request, res: Response){
+    static async show(req: Request, res: Response){
 
     }
 
@@ -41,7 +41,7 @@ export class ProfileController{
                 return;
             }
             
-            const imageFunction = imageValidation(profile);
+            const imageFunction = imageValidationAndUpload(profile);
 
             if(!imageFunction.success){
                 res.status(400).json({
