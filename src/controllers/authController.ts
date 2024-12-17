@@ -1,12 +1,13 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { ValidateRegister } from "../utils/errorHandling";
 import bcrypt from "bcrypt";
 import { prisma } from "../db";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { sendVerificationEmail } from "../utils/emailConfig";
 
 class AuthController{
 
-    static async register(req: Request, res: Response, next: NextFunction){
+    static async register(req: Request, res: Response){
 
         try{
 
@@ -18,6 +19,7 @@ class AuthController{
                 res.status(422).json({
                     error: validate.error
                 })
+                return;
 
             }else{
                 
@@ -32,7 +34,7 @@ class AuthController{
 
                 if(findUser){
                     res.status(422).json({
-                        message: "User exists. please Login"
+                        message: "Email already exists. please Login"
                     })
                     return;
                 }
@@ -41,7 +43,7 @@ class AuthController{
                     data: {
                         name,
                         email,
-                        password: hashedPassword
+                        password: hashedPassword,
                     }
                 })
 
@@ -54,9 +56,18 @@ class AuthController{
                 }
 
                 const token = jwt.sign(payload, process.env.JWT_SECRET || "");
+
+                await prisma.people.update({
+                    where: { id: user.id },
+                    data: {
+                        verification_token: token
+                    }
+                });
+                
+                await sendVerificationEmail(email, token);
         
                 res.status(200).json({
-                    message: "Register Successful",
+                    message: "Email sent Successfully",
                     token: `Bearer ${token}`
                 })
                 return;
@@ -72,7 +83,7 @@ class AuthController{
 
     }
 
-    static async login(req: Request, res: Response, next: NextFunction){
+    static async login(req: Request, res: Response){
         try{
 
             const {email, password} = req.body;
@@ -126,6 +137,45 @@ class AuthController{
             })
             console.error(error);
         }
+    }
+
+
+    static async verifyEmail(req: Request,  res: Response){
+
+        const token  = String(req.query.token);
+
+        try{
+
+            const decode = jwt.verify(token, process.env.JWT_SECRET || "") as JwtPayload;
+            
+            const email = decode.email;            
+
+        
+            const user = await prisma.people.findFirst({where:{email}});
+
+            if (!user || user.verification_token !== token) {
+                return res.status(400).json({ error: 'Invalid or expired token.' });
+            }
+
+            await prisma.people.update({
+                where: { email },
+                data: {
+                  is_verified: true,
+                  verification_token: null,
+                },
+              });
+          
+              res.status(200).json({ message: 'Email verified successfully.' });
+
+        }catch(error){
+            res.status(500).json({
+                error: "Internal Server Error"
+            })
+
+            console.error(error);
+            
+        }
+
     }
 
 }

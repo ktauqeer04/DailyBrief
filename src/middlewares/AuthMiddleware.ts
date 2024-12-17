@@ -12,20 +12,22 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     }
     const token = AuthHeader.split(" ")[1];
 
-    jwt.verify(token, process.env.JWT_SECRET || "", (error, user: any) => {
+    const decode = jwt.verify(token, process.env.JWT_SECRET || "", (error, user: any) => {
         if(error){
             res.status(401).json({
                 message: "Unauthorized"
             })
-        }
+        }        
+
+        console.log(`this is user's email -> ${user.email}`);
         
         //@ts-ignore
         req.user = user;
         //@ts-ignore
         // console.log(req.user);
-        
-        next();
     })
+    
+    next();
 
 ;}
 

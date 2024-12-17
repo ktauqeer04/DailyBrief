@@ -10,6 +10,8 @@ const router = express.Router();
 
 router.post('/auth/register', AuthController.register);
 router.post('/auth/login', AuthController.login);
+//@ts-ignore
+router.get('/auth/verify-email', AuthController.verifyEmail);
 router.put('/profile/:id', authMiddleware, ProfileController.update);
 
 // news routes
