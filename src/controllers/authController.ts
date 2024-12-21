@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { ValidateRegister } from "../utils/errorHandling";
 import bcrypt from "bcrypt";
 import { prisma } from "../db";
