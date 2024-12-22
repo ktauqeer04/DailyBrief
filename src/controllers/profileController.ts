@@ -34,6 +34,7 @@ export class ProfileController{
     static async remove(req: Request, res: Response){
 
         const { id } = req.params;
+
         //@ts-ignore
         const tokenId = req.user.id;
 
@@ -46,6 +47,7 @@ export class ProfileController{
             });
             return;
         }
+
 
         const findUser = await prisma.people.findFirst({where:{ id: Number(id) }});
 

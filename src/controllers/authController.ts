@@ -3,7 +3,7 @@ import { ValidateRegister } from "../utils/errorHandling";
 import bcrypt from "bcrypt";
 import { prisma } from "../db";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { sendVerificationEmail } from "../utils/emailConfig";
+import { emailQueue } from "../queue/worker"
 
 class AuthController{
 
@@ -57,14 +57,18 @@ class AuthController{
 
                 const token = jwt.sign(payload, process.env.JWT_SECRET || "");
 
+                await emailQueue.add('project01-verify-email', {
+                    email: email,
+                    token: token
+                })
+
                 await prisma.people.update({
                     where: { id: user.id },
                     data: {
                         verification_token: token
                     }
                 });
-                
-                await sendVerificationEmail(email, token);
+
         
                 res.status(200).json({
                     message: "Email sent Successfully",
