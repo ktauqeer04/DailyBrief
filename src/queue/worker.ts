@@ -5,11 +5,13 @@ dotenv.config();
 import { Queue } from "bullmq";
 
 
+const redisConfig = {
+    host: process.env.REDIS_HOST || 'localhost', // Default to localhost for local development
+    port: parseInt(process.env.REDIS_PORT || '6379', 10), // Default Redis port
+};
+
 export const emailQueue = new Queue('project01-verify-email', {
-    connection:{
-        host: '127.0.0.1',
-        port: 6379
-    }
+    connection: redisConfig,
 });
 
 
@@ -25,10 +27,7 @@ const emailWorker = new Worker('project01-verify-email', async (job) => {
     await sendVerificationEmail(email, token);
     
 },{
-    connection: {
-        host: '127.0.0.1',
-        port: 6379
-    }
+    connection: redisConfig
 })
 
 emailWorker.on('completed', (job) => {
