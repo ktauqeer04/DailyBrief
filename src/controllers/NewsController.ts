@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ValidateNews } from "../utils/errorHandling";
 import { imageValidationAndUpload, removeImage } from "../utils/imgConfig";
 import { prisma } from "../db";
-import { NewsTransform } from "../transform/newsTransform";
+import { News, NewsTransform } from "../transform/newsTransform";
 
 export class NewsController{
 
@@ -30,7 +30,7 @@ export class NewsController{
                 take: limit
             });
     
-            const transformedNews = allNews.map((item) => NewsTransform.Transform(item));
+            const transformedNews = allNews.map((item : News) => NewsTransform.Transform(item));
 
             const totalNews = await prisma.people.count();
             const totalPages = Math.ceil(totalNews / limit);
