@@ -8,12 +8,14 @@ import helmet from 'helmet';
 import { limiter } from './utils/rateLimiter';
 
 dotenv.config()
-console.log(process.env.PORT);
+
+
 const PORT = process.env.PORT;
-console.log(PORT);
 
 const app = express();
 
+
+//******************MIDDLEWARES******************************** */
 app.use(express.json());
 app.use(fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 }
@@ -24,7 +26,9 @@ app.use(cors());
 app.use(limiter);
 app.use('/api', router);
 
-app.get('/',(res: express.Response) => {
+//*************************************************************** */
+
+app.get('/', (req: express.Request, res: express.Response) => {
     res.status(200).json({
         message: "healthy"
     })

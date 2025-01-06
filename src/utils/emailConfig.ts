@@ -14,7 +14,10 @@ export const sendVerificationEmail = async (to_email : string, token : string) =
 
     try{
 
-        const URL = process.env.PROD_URL ? process.env.PROD_URL : process.env.DEV_URL;
+        const URL = process.env.RENDER_EXTERNAL_URL as string | null;
+        if (!URL) {
+            throw new Error('No valid URL found for the environment');
+        }
         const verificationEmail = `${URL}/api/auth/verify-email?token=${token}`;
     
         const mailOptions = {

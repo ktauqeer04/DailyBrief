@@ -52,7 +52,7 @@ router.get('/profile/:id', AuthMiddleware_1.default, profileController_1.Profile
 router.delete('/profile/:id', AuthMiddleware_1.default, profileController_1.ProfileController.remove);
 // news routes
 router.post('/news/post', AuthMiddleware_1.default, NewsController_1.NewsController.store);
-router.get('/news/fetch', AuthMiddleware_1.default, NewsController_1.NewsController.Fetch);
+router.get('/news/fetch', NewsController_1.NewsController.Fetch);
 router.get('/news/fetch/:id', AuthMiddleware_1.default, NewsController_1.NewsController.show);
 router.put('/news/update/:id', AuthMiddleware_1.default, NewsController_1.NewsController.update);
 router.delete('/news/delete/:id', AuthMiddleware_1.default, NewsController_1.NewsController.remove);
