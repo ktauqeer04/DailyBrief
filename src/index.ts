@@ -8,7 +8,10 @@ import helmet from 'helmet';
 import { limiter } from './utils/rateLimiter';
 
 dotenv.config()
-const PORT = process.env.PORT || 3000;
+console.log(process.env.PORT);
+const PORT = process.env.PORT;
+console.log(PORT);
+
 const app = express();
 
 app.use(express.json());
@@ -21,7 +24,15 @@ app.use(cors());
 app.use(limiter);
 app.use('/api', router);
 
-app.listen(3000, () => {console.log(`app is listening at PORT 3000`);
+app.get('/',(res: express.Response) => {
+    res.status(200).json({
+        message: "healthy"
+    })
+    return;
+})
+
+app.listen(PORT, () => 
+    {console.log(`app is listening at PORT ${PORT}`);
 })
 
  

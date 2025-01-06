@@ -20,7 +20,7 @@ router.delete('/profile/:id', authMiddleware, ProfileController.remove);
 
 // news routes
 router.post('/news/post', authMiddleware, NewsController.store);
-router.get('/news/fetch', authMiddleware, NewsController.Fetch);
+router.get('/news/fetch', NewsController.Fetch);
 router.get('/news/fetch/:id', authMiddleware, NewsController.show);
 router.put('/news/update/:id', authMiddleware, NewsController.update)
 router.delete('/news/delete/:id', authMiddleware, NewsController.remove)
