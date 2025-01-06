@@ -1,43 +1,58 @@
-import { Worker } from "bullmq";
+import { Worker, Queue } from "bullmq";
 import * as dotenv from "dotenv";
 import { sendVerificationEmail } from "../utils/emailConfig";
+import IORedis from "ioredis";
+
 dotenv.config();
-import { Queue } from "bullmq";
-import IOredis from "ioredis";
 
-const connection = new IOredis({maxRetriesPerRequest: null});
-
-// const redisConfig = {
-//     host: process.env.REDIS_HOST || 'localhost', // Default to localhost for local development
-//     port: parseInt(process.env.REDIS_PORT || '6379', 10), // Default Redis port
-// };
-
-export const emailQueue = new Queue('project01-verify-email', {
-    connection: connection,
+// Use REDIS_URL from environment variables
+const connection = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
+  maxRetriesPerRequest: null,
+  retryStrategy(times) {
+    // Exponential backoff with max delay of 10 seconds
+    const delay = Math.min(times * 50, 10000);
+    return delay;
+  },
+  reconnectOnError(err) {
+    const targetError = 'READONLY';
+    if (err.message.includes(targetError)) {
+      return true;
+    }
+    return false;
+  }
 });
 
+connection.on('error', (error) => {
+  console.error('Redis connection error:', error);
+});
+
+connection.on('connect', () => {
+  console.log('Successfully connected to Redis');
+});
+
+export const emailQueue = new Queue('project01-verify-email', {
+  connection,
+});
 
 const emailWorker = new Worker('project01-verify-email', async (job) => {
-
-    const { email, token } = job.data;
+  const { email, token } = job.data;
     
-    await new Promise((resolve) => {
-        console.log("the email worker data is", job.data);
-        setTimeout(resolve, 4000)
-    });
+  await new Promise((resolve) => {
+    console.log("the email worker data is", job.data);
+    setTimeout(resolve, 4000);
+  });
 
-    await sendVerificationEmail(email, token);
-    
-},{
-    connection: connection
-})
+  await sendVerificationEmail(email, token);
+}, {
+  connection,
+});
 
 emailWorker.on('completed', (job) => {
-    console.log(`email is sent to ${job.data.email}`);
-})
+  console.log(`Email sent to ${job.data.email}`);
+});
 
-emailWorker.on('failed', (job) => {
-    console.log(`failed to send email`);
-})
+emailWorker.on('failed', (job, err) => {
+  console.error(`Failed to send email:`, err);
+});
 
-console.log(`log till last`);
+console.log('Worker initialized');
