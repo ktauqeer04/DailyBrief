@@ -94,7 +94,8 @@ class AuthController{
             // first verifying whether the email exists
             const findUser = await prisma.people.findFirst({
                 where: {
-                    email
+                    email,
+                    is_verified: true
                 }
             })
 
