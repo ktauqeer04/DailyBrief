@@ -3,15 +3,17 @@ import * as dotenv from "dotenv";
 import { sendVerificationEmail } from "../utils/emailConfig";
 dotenv.config();
 import { Queue } from "bullmq";
+import IOredis from "ioredis";
 
+const connection = new IOredis({maxRetriesPerRequest: null});
 
-const redisConfig = {
-    host: process.env.REDIS_HOST || 'localhost', // Default to localhost for local development
-    port: parseInt(process.env.REDIS_PORT || '6379', 10), // Default Redis port
-};
+// const redisConfig = {
+//     host: process.env.REDIS_HOST || 'localhost', // Default to localhost for local development
+//     port: parseInt(process.env.REDIS_PORT || '6379', 10), // Default Redis port
+// };
 
 export const emailQueue = new Queue('project01-verify-email', {
-    connection: redisConfig,
+    connection: connection,
 });
 
 
@@ -27,7 +29,7 @@ const emailWorker = new Worker('project01-verify-email', async (job) => {
     await sendVerificationEmail(email, token);
     
 },{
-    connection: redisConfig
+    connection: connection
 })
 
 emailWorker.on('completed', (job) => {
