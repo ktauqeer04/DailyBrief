@@ -5,6 +5,8 @@
   "type": "commonjs",
   "start:nodemon": "./node_modules/nodemon/bin/nodemon.js",
   "scripts": {
+    "generate": "npx prisma generate",
+    "deploy": "npx prisma migrate deploy",
     "build": "tsc",
     "dev": "nodemon --watch src --exec ts-node ./src/index.ts",
     "nodemon": "nodemon --watch './src/**/*.ts' --exec 'ts-node' ./src/index.ts",
