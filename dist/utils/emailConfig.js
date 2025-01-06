@@ -16,7 +16,10 @@ const transporter = nodemailer_1.default.createTransport({
 });
 const sendVerificationEmail = async (to_email, token) => {
     try {
-        const URL = process.env.PROD_URL ? process.env.PROD_URL : process.env.DEV_URL;
+        const URL = process.env.RENDER_EXTERNAL_URL;
+        if (!URL) {
+            throw new Error('No valid URL found for the environment');
+        }
         const verificationEmail = `${URL}/api/auth/verify-email?token=${token}`;
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
