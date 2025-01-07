@@ -3,10 +3,16 @@ import * as dotenv from "dotenv";
 import { sendVerificationEmail } from "../utils/emailConfig";
 dotenv.config();
 import { Queue } from "bullmq";
-import IOredis from "ioredis";
+import Redis from "ioredis";
 
-const connection = new IOredis("rediss://default:AVZVAAIjcDE1NGE5N2MwMmY0NTk0YjdlYWEwMTYzYjcyYTQwYjdkNHAxMA@magnetic-crayfish-22101.upstash.io:6379", {maxRetriesPerRequest: null});
-
+const connection = new Redis({
+    username: 'default',
+    password: 'taGQx7IqldJ4hqc2blTuHIh0T2x9OKRz',
+    host: 'redis-17037.c330.asia-south1-1.gce.redns.redis-cloud.com',
+    port: 17037,
+    maxRetriesPerRequest: null
+}
+);
 // const redisConfig = {
 //     host: process.env.REDIS_HOST || 'localhost', // Default to localhost for local development
 //     port: parseInt(process.env.REDIS_PORT || '6379', 10), // Default Redis port
