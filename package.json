@@ -43,7 +43,7 @@
     "@types/nodemailer": "^6.4.17",
     "nodemailer": "^6.9.16",
     "nodemon": "^3.1.7",
-    "prisma": "^6.0.1",
+    "prisma": "^6.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "wrangler": "^3.99.0"
@@ -51,5 +51,4 @@
   "engines": {
     "node": "22.12.0"
   }
-
 }
