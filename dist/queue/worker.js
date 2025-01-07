@@ -43,7 +43,7 @@ const emailConfig_1 = require("../utils/emailConfig");
 dotenv.config();
 const bullmq_2 = require("bullmq");
 const ioredis_1 = __importDefault(require("ioredis"));
-const connection = new ioredis_1.default({ maxRetriesPerRequest: null });
+const connection = new ioredis_1.default("rediss://default:AVZVAAIjcDE1NGE5N2MwMmY0NTk0YjdlYWEwMTYzYjcyYTQwYjdkNHAxMA@magnetic-crayfish-22101.upstash.io:6379", { maxRetriesPerRequest: null });
 // const redisConfig = {
 //     host: process.env.REDIS_HOST || 'localhost', // Default to localhost for local development
 //     port: parseInt(process.env.REDIS_PORT || '6379', 10), // Default Redis port

@@ -5,7 +5,7 @@ dotenv.config();
 import { Queue } from "bullmq";
 import IOredis from "ioredis";
 
-const connection = new IOredis({maxRetriesPerRequest: null});
+const connection = new IOredis("rediss://default:AVZVAAIjcDE1NGE5N2MwMmY0NTk0YjdlYWEwMTYzYjcyYTQwYjdkNHAxMA@magnetic-crayfish-22101.upstash.io:6379", {maxRetriesPerRequest: null});
 
 // const redisConfig = {
 //     host: process.env.REDIS_HOST || 'localhost', // Default to localhost for local development
