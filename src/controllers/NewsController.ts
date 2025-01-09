@@ -3,6 +3,7 @@ import { ValidateNews } from "../utils/errorHandling";
 import { imageValidationAndUpload, removeImage } from "../utils/imgConfig";
 import { prisma } from "../db";
 import { News, NewsTransform } from "../transform/newsTransform";
+import { redis } from "../queue/worker"
 
 export class NewsController{
 
@@ -15,6 +16,24 @@ export class NewsController{
             const skip = (page - 1) * limit;
             console.log(`page is ${page}, limit is ${limit}, skip is ${skip}`);
             
+            const cacheKey = `news:page=${page}:limit=${limit}`
+
+            const cachedData = await redis.get(cacheKey);
+
+            if(cachedData){
+                console.log("Serving from cache");
+                const { transformedNews, totalPages } = JSON.parse(cachedData);
+
+                res.status(200).json({
+                    message: transformedNews,
+                    metaData: {
+                        totalPages: totalPages,
+                        currentPage: page,
+                        limit: limit,
+                    },
+                });
+                return;
+            }
 
             const allNews = await prisma.news.findMany({
                 skip: skip,
@@ -34,6 +53,11 @@ export class NewsController{
 
             const totalNews = await prisma.people.count();
             const totalPages = Math.ceil(totalNews / limit);
+
+            const cacheValue = JSON.stringify({ transformedNews, totalPages });
+            await redis.set(cacheKey, cacheValue, "EX", 3600); 
+
+
     
             res.status(200).json({
                 message: transformedNews,

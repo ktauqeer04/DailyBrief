@@ -5,6 +5,7 @@ const errorHandling_1 = require("../utils/errorHandling");
 const imgConfig_1 = require("../utils/imgConfig");
 const db_1 = require("../db");
 const newsTransform_1 = require("../transform/newsTransform");
+const worker_1 = require("../queue/worker");
 class NewsController {
     static async Fetch(req, res) {
         try {
@@ -12,6 +13,21 @@ class NewsController {
             const limit = (Number(req.query.limit) <= 0 || Number(req.query.limit) > 100 || !Number(req.query.limit)) ? 10 : Number(req.query.limit);
             const skip = (page - 1) * limit;
             console.log(`page is ${page}, limit is ${limit}, skip is ${skip}`);
+            const cacheKey = `news:page=${page}:limit=${limit}`;
+            const cachedData = await worker_1.redis.get(cacheKey);
+            if (cachedData) {
+                console.log("Serving from cache");
+                const { transformedNews, totalPages } = JSON.parse(cachedData);
+                res.status(200).json({
+                    message: transformedNews,
+                    metaData: {
+                        totalPages: totalPages,
+                        currentPage: page,
+                        limit: limit,
+                    },
+                });
+                return;
+            }
             const allNews = await db_1.prisma.news.findMany({
                 skip: skip,
                 include: {
@@ -28,6 +44,8 @@ class NewsController {
             const transformedNews = allNews.map((item) => newsTransform_1.NewsTransform.Transform(item));
             const totalNews = await db_1.prisma.people.count();
             const totalPages = Math.ceil(totalNews / limit);
+            const cacheValue = JSON.stringify({ transformedNews, totalPages });
+            await worker_1.redis.set(cacheKey, cacheValue, "EX", 3600);
             res.status(200).json({
                 message: transformedNews,
                 metaData: {

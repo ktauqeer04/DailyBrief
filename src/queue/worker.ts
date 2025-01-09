@@ -5,7 +5,7 @@ dotenv.config();
 import { Queue } from "bullmq";
 import Redis from "ioredis";
 
-const connection = new Redis({
+export const redis = new Redis({
     username: 'default',
     password: 'taGQx7IqldJ4hqc2blTuHIh0T2x9OKRz',
     host: 'redis-17037.c330.asia-south1-1.gce.redns.redis-cloud.com',
@@ -19,7 +19,7 @@ const connection = new Redis({
 // };
 
 export const emailQueue = new Queue('project01-verify-email', {
-    connection: connection,
+    connection: redis,
 });
 
 
@@ -35,7 +35,7 @@ const emailWorker = new Worker('project01-verify-email', async (job) => {
     await sendVerificationEmail(email, token);
     
 },{
-    connection: connection
+    connection: redis
 })
 
 emailWorker.on('completed', (job) => {
