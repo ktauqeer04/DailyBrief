@@ -10,7 +10,6 @@ const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const path_1 = __importDefault(require("path"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
-const rateLimiter_1 = require("./utils/rateLimiter");
 dotenv_1.default.config();
 const PORT = process.env.PORT;
 const app = express();
@@ -22,7 +21,7 @@ app.use((0, express_fileupload_1.default)({
 app.use('/public', express.static(path_1.default.join(__dirname, '/public')));
 app.use((0, helmet_1.default)());
 app.use((0, cors_1.default)());
-app.use(rateLimiter_1.limiter);
+// app.use(limiter);
 app.use('/api', api_1.default);
 //*************************************************************** */
 app.get('/', (req, res) => {

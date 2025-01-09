@@ -23,7 +23,7 @@ app.use(fileUpload({
 app.use('/public', express.static(path.join(__dirname, '/public')));
 app.use(helmet());
 app.use(cors());
-app.use(limiter);
+// app.use(limiter);
 app.use('/api', router);
 
 //*************************************************************** */

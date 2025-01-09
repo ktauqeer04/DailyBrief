@@ -56,7 +56,9 @@ class AuthController{
                 }
 
                 const token = jwt.sign(payload, process.env.JWT_SECRET || "");
-
+                
+                console.log(`before email worker`);
+                
                 await emailQueue.add('project01-verify-email', {
                     email: email,
                     token: token
