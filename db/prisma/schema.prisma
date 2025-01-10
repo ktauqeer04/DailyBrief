@@ -14,25 +14,37 @@ datasource db {
 }
 
 model People {
-  id                   Int              @id @default(autoincrement())
-  name                 String           @db.VarChar(191)
-  email                String           @unique @db.VarChar(191)
-  password             String
-  profile              String?
-  is_verified          Boolean          @default(false)
-  verification_token   String?
-  created_at           DateTime         @default(now())
-  updated_at           DateTime         @default(now())
-  News                 News[]
+  id                    Int            @id @default(autoincrement())
+  name                  String         @db.VarChar(191)
+  email                 String         @unique @db.VarChar(191)
+  password              String
+  profile               String?
+  is_verified           Boolean        @default(false)
+  verification_token    String?
+  created_at            DateTime       @default(now())
+  updated_at            DateTime       @default(now())
+  News                  News[]
+  subscriptions         Subscription[] @relation("UserSubscriptions")
+  authoredSubscriptions Subscription[] @relation("AuthorSubscriptions")
 }
 
-model News{
-  id      Int      @id @default(autoincrement())
-  author_id   Int  
-  author  People   @relation(fields: [author_id], references:[id])
-  title   String   @db.VarChar
-  content String
-  image   String   @db.VarChar(100)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @default(now())
+model News {
+  id         Int      @id @default(autoincrement())
+  author_id  Int
+  author     People   @relation(fields: [author_id], references: [id])
+  title      String   @db.VarChar
+  content    String
+  image      String   @db.VarChar(100)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+model Subscription {
+  id         Int      @id @default(autoincrement())
+  author_id  Int
+  user_id    Int
+  created_at DateTime @default(now())
+
+  user   People @relation("UserSubscriptions", fields: [user_id], references: [id])
+  author People @relation("AuthorSubscriptions", fields: [author_id], references: [id])
 }

@@ -169,8 +169,10 @@ export class NewsController{
                 where:{
                     id: Number(id)
                 },
-                include:{
-                    author:{
+                select:{
+                    title: true,
+                    image: true,
+                    author: {
                         select:{
                             id: true,
                             name: true,
@@ -187,10 +189,10 @@ export class NewsController{
                 return;
             }
 
-            const updatedNews = NewsTransform.Transform(news);
+            const News = NewsTransform.Transform(news);
         
             res.status(200).json({
-                updatedNews
+                News
             })
             return;
         } catch (error) {

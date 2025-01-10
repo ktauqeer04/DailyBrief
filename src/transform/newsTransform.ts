@@ -1,11 +1,11 @@
 import { defautlImageURL, getProfileImageURL } from "../utils/imgConfig";
 
 export interface News{
-    id: number,
+    id?: number,
     title: string,
-    content: string,
+    content?: string,
     image: string,
-    created_at: Date,
+    created_at?: Date,
     author: {
         id: number,
         name: string,
