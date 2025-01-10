@@ -5,21 +5,21 @@ dotenv.config();
 import { Queue } from "bullmq";
 import Redis from "ioredis";
 
-export const redis = new Redis({
-    username: 'default',
-    password: '6bX6eUrzOpEF8IlC6xN28TYNBFkhYEK3',
-    host: 'redis-16078.c330.asia-south1-1.gce.redns.redis-cloud.com',
-    port: 16078,
+// export const redis = new Redis({
+//     username: 'default',
+//     password: '6bX6eUrzOpEF8IlC6xN28TYNBFkhYEK3',
+//     host: 'redis-16078.c330.asia-south1-1.gce.redns.redis-cloud.com',
+//     port: 16078,
+//     maxRetriesPerRequest: null
+// })
+const redisConfig = {
+    host: '127.0.0.1',
+    port: 6379,
     maxRetriesPerRequest: null
-})
+}
 
-const connection = new Redis({
-    username: 'default',
-    password: 'taGQx7IqldJ4hqc2blTuHIh0T2x9OKRz',
-    host: 'redis-17037.c330.asia-south1-1.gce.redns.redis-cloud.com',
-    port: 17037,
-    maxRetriesPerRequest: null
-});
+export const connection = new Redis(redisConfig);
+export const redis = new Redis(redisConfig)
 
 connection.on('connect', () => {
     console.log('Connected to Redis successfully');
@@ -44,10 +44,10 @@ const emailWorker = new Worker('project01-verify-email', async (job) => {
         const { email, token } = job.data;
         console.log(`Starting to process email job for ${email}`);
         
-        await new Promise((resolve) => {
-            console.log("Waiting 4 seconds...");
-            setTimeout(resolve, 4000)
-        });
+        // await new Promise((resolve) => {
+        //     console.log("Waiting 4 seconds...");
+        //     setTimeout(resolve, 4000)
+        // });
         
         console.log("Attempting to send verification email...");
         await sendVerificationEmail(email, token);
@@ -59,7 +59,7 @@ const emailWorker = new Worker('project01-verify-email', async (job) => {
 
 
 },{
-    connection: connection
+    connection: connection,
 })
 
 emailWorker.on('completed', (job) => {

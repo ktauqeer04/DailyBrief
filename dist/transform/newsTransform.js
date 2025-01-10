@@ -10,7 +10,7 @@ class NewsTransform {
             content: news.content,
             image: (0, imgConfig_1.getProfileImageURL)(news.image),
             created_at: news.created_at,
-            reporter: {
+            author: {
                 id: news.author.id,
                 name: news.author.name,
                 profile: news.author.profile !== null ? (0, imgConfig_1.getProfileImageURL)(news.author.profile) : (0, imgConfig_1.defautlImageURL)("defaultImage.webp")

@@ -23,7 +23,7 @@ export class NewsTransform{
             content: news.content,
             image: getProfileImageURL(news.image),
             created_at: news.created_at,
-            reporter:{
+            author:{
                 id: news.author.id,
                 name: news.author.name,
                 profile: news.author.profile !== null ? getProfileImageURL(news.author.profile) : defautlImageURL("defaultImage.webp")

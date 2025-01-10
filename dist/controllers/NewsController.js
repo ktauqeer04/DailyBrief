@@ -10,10 +10,10 @@ class NewsController {
     static async Fetch(req, res) {
         try {
             const page = Number(req.query.page) <= 0 || !Number(req.query.page) ? 1 : Number(req.query.page);
-            const limit = (Number(req.query.limit) <= 0 || Number(req.query.limit) > 100 || !Number(req.query.limit)) ? 10 : Number(req.query.limit);
+            const limit = 10;
             const skip = (page - 1) * limit;
             console.log(`page is ${page}, limit is ${limit}, skip is ${skip}`);
-            const cacheKey = `news:page=${page}:limit=${limit}`;
+            const cacheKey = `news:page=${page}`;
             const cachedData = await worker_1.redis.get(cacheKey);
             if (cachedData) {
                 console.log("Serving from cache");
@@ -45,7 +45,7 @@ class NewsController {
             const totalNews = await db_1.prisma.people.count();
             const totalPages = Math.ceil(totalNews / limit);
             const cacheValue = JSON.stringify({ transformedNews, totalPages });
-            await worker_1.redis.set(cacheKey, cacheValue, "EX", 3600);
+            await worker_1.redis.set(cacheKey, cacheValue, "EX", 420);
             res.status(200).json({
                 message: transformedNews,
                 metaData: {
@@ -95,6 +95,8 @@ class NewsController {
                 });
                 return;
             }
+            // clear cache 
+            // const cacheKey = `news:page:${}`
             const news = await db_1.prisma.news.create({
                 data: {
                     author_id: userid,
@@ -103,6 +105,14 @@ class NewsController {
                     image: imageFunction.message
                 }
             });
+            const id = news.id;
+            const page = Math.ceil(id / 10);
+            const cacheKey = `news:page=${page}`;
+            const cachedData = await worker_1.redis.get(cacheKey);
+            if (cachedData) {
+                await worker_1.redis.del(cacheKey);
+                console.log(`Cache key deleted successfully`);
+            }
             res.status(200).json({
                 news
             });
@@ -211,6 +221,13 @@ class NewsController {
                     image: imageName
                 }
             });
+            const page = Math.ceil(news.id / 10);
+            const cacheKey = `news:page=${page}`;
+            const cachedData = await worker_1.redis.get(cacheKey);
+            if (cachedData) {
+                await worker_1.redis.del(cacheKey);
+                console.log(`Cache key deleted successfully`);
+            }
             res.status(200).json({
                 message: "Successfully updated"
             });
