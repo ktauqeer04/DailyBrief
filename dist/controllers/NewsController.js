@@ -130,7 +130,9 @@ class NewsController {
                 where: {
                     id: Number(id)
                 },
-                include: {
+                select: {
+                    title: true,
+                    image: true,
                     author: {
                         select: {
                             id: true,
@@ -146,9 +148,9 @@ class NewsController {
                 });
                 return;
             }
-            const updatedNews = newsTransform_1.NewsTransform.Transform(news);
+            const News = newsTransform_1.NewsTransform.Transform(news);
             res.status(200).json({
-                updatedNews
+                News
             });
             return;
         }

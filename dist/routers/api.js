@@ -41,6 +41,7 @@ const authController_1 = __importDefault(require("../controllers/authController"
 const AuthMiddleware_1 = __importDefault(require("../middlewares/AuthMiddleware"));
 const profileController_1 = require("../controllers/profileController");
 const NewsController_1 = require("../controllers/NewsController");
+const subsController_1 = require("../controllers/subsController");
 // import {ProfileController} from "../controllers/profileController";
 const router = express.Router();
 router.post('/auth/register', authController_1.default.register);
@@ -56,4 +57,6 @@ router.get('/news/fetch', NewsController_1.NewsController.Fetch);
 router.get('/news/fetch/:id', AuthMiddleware_1.default, NewsController_1.NewsController.show);
 router.put('/news/update/:id', AuthMiddleware_1.default, NewsController_1.NewsController.update);
 router.delete('/news/delete/:id', AuthMiddleware_1.default, NewsController_1.NewsController.remove);
+// subscribe route
+router.post('/v1/subscribe', AuthMiddleware_1.default, subsController_1.SubscribeController.subscribe);
 exports.default = router;

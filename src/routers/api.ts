@@ -4,6 +4,7 @@ import AuthController from "../controllers/authController";
 import authMiddleware from "../middlewares/AuthMiddleware"
 import { ProfileController } from "../controllers/profileController";
 import { NewsController } from "../controllers/NewsController";
+import { SubscribeController } from "../controllers/subsController";
 // import {ProfileController} from "../controllers/profileController";
 
 const router = express.Router();
@@ -24,6 +25,9 @@ router.get('/news/fetch', NewsController.Fetch);
 router.get('/news/fetch/:id', authMiddleware, NewsController.show);
 router.put('/news/update/:id', authMiddleware, NewsController.update)
 router.delete('/news/delete/:id', authMiddleware, NewsController.remove)
+
+// subscribe route
+router.post('/v1/subscribe', authMiddleware, SubscribeController.subscribe)
 
 export default router;
 
