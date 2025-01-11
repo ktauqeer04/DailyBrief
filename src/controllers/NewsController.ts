@@ -3,7 +3,7 @@ import { ValidateNews } from "../utils/errorHandling";
 import { imageValidationAndUpload, removeImage } from "../utils/imgConfig";
 import { prisma } from "../db";
 import { News, NewsTransform } from "../transform/newsTransform";
-import { redis } from "../queue/worker"
+import { notificationQueue, redis } from "../queue/worker"
 
 export class NewsController{
 
@@ -86,7 +86,7 @@ export class NewsController{
             const userid = req.user.id;
             // console.log(`id is ${userid}`);
             
-            console.log({title, content});
+            // console.log({title, content});
             
             const validate = ValidateNews({title, content});
             
@@ -147,11 +147,45 @@ export class NewsController{
                 console.log(`Cache key deleted successfully`);
             }
 
+            
+            const Emails = await prisma.subscription.findMany({
+                where: {
+                    author_id: userid
+                },
+                include: {
+                    user:{
+                        select:{
+                            email: true
+                        }
+                    }
+                }
+            })
+
+            const EmailArray: Array<string> = [];
+            Emails.map((data) => {
+                EmailArray.push(data.user.email)
+                // console.log(data.user.email);
+            })
+
+            //@ts-ignore
+            // console.log(req.user.name);
+            
+
+            // console.log(Emails);
+
+            await notificationQueue.add('project01-news-notification',{
+                title,
+                content,
+                //@ts-ignore
+                author_name: req.user.name,
+                Emails: EmailArray  
+            })
 
             res.status(200).json({
-                news
+                message: "News Posted and emails have been sent to subscribers"
             })
-            
+            return;
+                  
 
         }catch(error){
             res.status(500)

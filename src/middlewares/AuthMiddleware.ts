@@ -19,12 +19,12 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
             })
         }        
 
-        console.log(`this is user's email -> ${user.email}`);
+        // console.log(`this is user's email -> ${user.email}`);
         
         //@ts-ignore
         req.user = user;
         //@ts-ignore
-        console.log(req.user);
+        // console.log(req.user);
 
     })
     

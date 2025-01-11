@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.emailQueue = exports.redis = exports.connection = void 0;
+exports.notificationWorker = exports.notificationQueue = exports.emailQueue = exports.redis = exports.connection = void 0;
 const bullmq_1 = require("bullmq");
 const dotenv = __importStar(require("dotenv"));
 const emailConfig_1 = require("../utils/emailConfig");
@@ -70,6 +70,9 @@ exports.connection.on('error', (err) => {
 exports.emailQueue = new bullmq_2.Queue('project01-verify-email', {
     connection: exports.connection,
 });
+exports.notificationQueue = new bullmq_2.Queue('project01-news-notification', {
+    connection: exports.connection
+});
 const emailWorker = new bullmq_1.Worker('project01-verify-email', async (job) => {
     try {
         const { email, token } = job.data;
@@ -95,4 +98,20 @@ emailWorker.on('completed', (job) => {
 emailWorker.on('failed', (job) => {
     console.log(`failed to send email`);
 });
-console.log(`log till last`);
+exports.notificationWorker = new bullmq_1.Worker('project01-news-notification', async (job) => {
+    try {
+        const { title, content, author_name, Emails } = job.data;
+        console.log("Attempting to notification email...");
+        await (0, emailConfig_1.sendNotificationEmail)(Emails, author_name, title, content);
+    }
+    catch (error) {
+        throw new Error(`Error is ${error}`);
+    }
+}, {
+    connection: exports.connection
+}).on('completed', (job) => {
+    console.log(`Emails have been sent to ${job.data.Emails}`);
+}).on('failed', (job) => {
+    console.log(`Failed to send emails to ${job?.data.Emails}`);
+});
+// console.log(`log till last`);

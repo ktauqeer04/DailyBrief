@@ -19,11 +19,11 @@ const authMiddleware = (req, res, next) => {
                 message: "Unauthorized"
             });
         }
-        console.log(`this is user's email -> ${user.email}`);
+        // console.log(`this is user's email -> ${user.email}`);
         //@ts-ignore
         req.user = user;
         //@ts-ignore
-        console.log(req.user);
+        // console.log(req.user);
     });
     next();
     ;

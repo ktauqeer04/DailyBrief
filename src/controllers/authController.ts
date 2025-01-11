@@ -147,7 +147,7 @@ class AuthController{
     }
 
 
-    static async verifyEmail(req: Request,  res: Response){
+    static async    verifyEmail(req: Request,  res: Response){
 
         const token  = String(req.query.token);
 

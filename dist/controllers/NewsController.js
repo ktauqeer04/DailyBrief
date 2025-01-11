@@ -67,7 +67,7 @@ class NewsController {
             //@ts-ignore
             const userid = req.user.id;
             // console.log(`id is ${userid}`);
-            console.log({ title, content });
+            // console.log({title, content});
             const validate = (0, errorHandling_1.ValidateNews)({ title, content });
             if (validate.isError) {
                 res.status(400).json({
@@ -113,9 +113,37 @@ class NewsController {
                 await worker_1.redis.del(cacheKey);
                 console.log(`Cache key deleted successfully`);
             }
-            res.status(200).json({
-                news
+            const Emails = await db_1.prisma.subscription.findMany({
+                where: {
+                    author_id: userid
+                },
+                include: {
+                    user: {
+                        select: {
+                            email: true
+                        }
+                    }
+                }
             });
+            const EmailArray = [];
+            Emails.map((data) => {
+                EmailArray.push(data.user.email);
+                // console.log(data.user.email);
+            });
+            //@ts-ignore
+            // console.log(req.user.name);
+            // console.log(Emails);
+            await worker_1.notificationQueue.add('project01-news-notification', {
+                title,
+                content,
+                //@ts-ignore
+                author_name: req.user.name,
+                Emails: EmailArray
+            });
+            res.status(200).json({
+                message: "News Posted and emails have been sent to subscribers"
+            });
+            return;
         }
         catch (error) {
             res.status(500);

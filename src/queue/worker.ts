@@ -1,6 +1,6 @@
 import { tryCatch, Worker } from "bullmq";
 import * as dotenv from "dotenv";
-import { sendVerificationEmail } from "../utils/emailConfig";
+import { sendNotificationEmail, sendVerificationEmail } from "../utils/emailConfig";
 dotenv.config();
 import { Queue } from "bullmq";
 import Redis from "ioredis";
@@ -37,6 +37,10 @@ export const emailQueue = new Queue('project01-verify-email', {
     connection: connection,
 });
 
+export const notificationQueue = new Queue('project01-news-notification', {
+    connection: connection
+})
+
 
 const emailWorker = new Worker('project01-verify-email', async (job) => {
 
@@ -70,4 +74,25 @@ emailWorker.on('failed', (job) => {
     console.log(`failed to send email`);
 })
 
-console.log(`log till last`);
+export const notificationWorker = new Worker('project01-news-notification', async(job) => {
+    try {
+        const {title, content, author_name, Emails} = job.data;
+        console.log("Attempting to notification email...");
+
+        await sendNotificationEmail(Emails, author_name, title, content);
+
+        
+    } catch (error) {
+        throw new Error(`Error is ${error}`)
+    }
+},
+{
+    connection: connection
+}
+).on('completed', (job) => {
+    console.log(`Emails have been sent to ${job.data.Emails}`);
+}).on('failed' , (job) => {
+    console.log(`Failed to send emails to ${job?.data.Emails}`);
+}) 
+
+// console.log(`log till last`);

@@ -8,12 +8,16 @@ export class SubscribeController{
 
         try {
 
-            const {user_id, author_id, isSubscribe} = req.body;
+            const { author_id, isSubscribe} = req.body;
+            //@ts-ignore
+            const {id} = req.user;
+            console.log(`Subscriber id is ${id}`);
+            
 
-            if(isSubscribe == true){
+            if(isSubscribe){
                 const subscribed = await prisma.subscription.create({
                     data:{
-                        user_id: user_id,
+                        user_id: id,
                         author_id: author_id,
                     }
                 })
@@ -26,9 +30,10 @@ export class SubscribeController{
                 }
     
             }else{
+
                 const deleteSubscription = await prisma.subscription.deleteMany({
                     where: {
-                        user_id: user_id,
+                        user_id: id,
                         author_id: author_id
                     }
                 })
