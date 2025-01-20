@@ -37,6 +37,8 @@ model News {
   image      String   @db.VarChar(100)
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
+
+  comments   Comment[] 
 }
 
 model Subscription {
@@ -47,4 +49,15 @@ model Subscription {
 
   user   People @relation("UserSubscriptions", fields: [user_id], references: [id])
   author People @relation("AuthorSubscriptions", fields: [author_id], references: [id])
+}
+
+
+model Comment{
+  id                    Int            @id  @default(autoincrement())
+  post_id               Int      
+  post                  News           @relation(fields: [post_id], references: [id])
+  commenter_name        String  
+  comment_description   String   
+  created_at            DateTime       @default(now())
+  updated_at            DateTime       @default(now())
 }

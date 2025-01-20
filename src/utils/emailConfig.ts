@@ -46,7 +46,7 @@ export const sendVerificationEmail = async (to_email : string, token : string) =
 export const sendNotificationEmail = async(Emails : Array<string>, author_name: string, title : string, content: string) => {
     try {
         
-        const contentOnEmail = (content.length > 100) ? content.substring(0, 99) : content;
+        const contentOnEmail = (content.length > 100) ? content.substring(0, 99) + "..." : content;
 
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
