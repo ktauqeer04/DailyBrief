@@ -204,6 +204,7 @@ export class NewsController{
                     id: Number(id)
                 },
                 select:{
+                    id: true,
                     title: true,
                     image: true,
                     author: {
@@ -354,6 +355,8 @@ export class NewsController{
 
     }
 
+
+    //delete post
     static async remove(req: Request, res: Response){
         try {
             const { id } = req.params;
@@ -390,10 +393,87 @@ export class NewsController{
             res.status(200).json({
                 message: `News of ${Number(id)} id deleted Successfully`
             })
+            return;
         } catch (error) {
             res.status(500);
             console.error(error);
         }
     }
+
+    // hit api end point to save post
+    static async SavePost(req: Request, res: Response){
+
+        try{
+            
+            const { postId } = req.body;
+            //@ts-ignore
+            const {id} = req.user;
+            
+            await prisma.savePost.create({
+                data:{
+                    post_id: Number(postId),
+                    user_id: Number(id)
+                }
+            });
+
+            res.status(200).json({
+                message: "Post saved Succcessfully"
+            })
+            return;
+            
+        }catch(error){
+
+            res.status(500);
+            console.error(error);
+
+        }
+
+    }
+
+    //hit api end point to get all the saved post
+    static async getSavedPost(req: Request, res: Response){
+
+        try {
+            
+            //@ts-ignore
+            const {id} = req.user;
+            
+            const firstTenPost = await prisma.savePost.findMany({
+                where:{
+                    user_id: id
+                },
+                include: {
+                    post: {
+                        select: {
+                            id: true,
+                            title: true,
+                            content: true,
+                            image: true,
+                            created_at: true,
+                        },                
+                    }
+                },
+                orderBy: {
+                    created_at: 'desc', // Optional: Order by the most recently saved posts
+                },
+                take: 10,
+            })
+
+            res.status(200).json({
+                firstTenPost
+            })
+
+            return;
+
+        } catch (error) {
+            
+            res.status(500);
+            console.error(error);
+
+        }
+
+    }
+
+
 }
 

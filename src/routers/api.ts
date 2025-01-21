@@ -23,9 +23,11 @@ router.delete('/profile/:id', authMiddleware, ProfileController.remove);
 // news routes
 router.post('/news/post', authMiddleware, NewsController.store);
 router.get('/news/fetch', NewsController.Fetch);
-router.get('/news/fetch/:id', authMiddleware, NewsController.show);
-router.put('/news/update/:id', authMiddleware, NewsController.update);
+router.get('/news/fetch/:id', NewsController.show);
+router.put('/news/update/:id', NewsController.update);
 router.delete('/news/delete/:id', authMiddleware, NewsController.remove);
+router.post('/news/save', authMiddleware, NewsController.SavePost);
+router.get('/news/savedpost', authMiddleware, NewsController.getSavedPost)
 
 // subscribe route
 router.post('/v1/subscribe', authMiddleware, SubscribeController.subscribe)
@@ -33,6 +35,7 @@ router.post('/v1/subscribe', authMiddleware, SubscribeController.subscribe)
 //comment route
 router.post('/news/comment', authMiddleware, commentController.commentPost)
 router.post('/news/comment/likes', authMiddleware, commentController.likes);
+
 
 export default router;
 
