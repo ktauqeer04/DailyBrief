@@ -37,7 +37,7 @@ model News {
   author     People   @relation(fields: [author_id], references: [id])
   title      String   @db.VarChar
   content    String
-  image      String   @db.VarChar(100)
+  image      String   @db.VarChar(200)
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 

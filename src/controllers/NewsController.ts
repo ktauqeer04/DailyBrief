@@ -84,9 +84,6 @@ export class NewsController{
             const {title, content} = req.body;
             //@ts-ignore
             const userid = req.user.id;
-            // console.log(`id is ${userid}`);
-            
-            // console.log({title, content});
             
             const validate = ValidateNews({title, content});
             
@@ -113,7 +110,7 @@ export class NewsController{
                 return;
             }
 
-            const imageFunction = imageValidationAndUpload(image);
+            const imageFunction = await imageValidationAndUpload(image);
 
             if(!imageFunction.success){
                 res.status(400).json({
@@ -299,7 +296,7 @@ export class NewsController{
                     return;
                 }
 
-                const imageFunction = imageValidationAndUpload(image);
+                const imageFunction = await imageValidationAndUpload(image);
                 imageName = imageFunction.message
 
                 if(!imageFunction.success){

@@ -88,7 +88,7 @@ export class ProfileController{
                 return;
             }
             
-            const imageFunction = imageValidationAndUpload(profile);
+            const imageFunction = await imageValidationAndUpload(profile);
 
             if(!imageFunction.success){
                 res.status(400).json({
