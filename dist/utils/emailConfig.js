@@ -39,7 +39,7 @@ const sendVerificationEmail = async (to_email, token) => {
 exports.sendVerificationEmail = sendVerificationEmail;
 const sendNotificationEmail = async (Emails, author_name, title, content) => {
     try {
-        const contentOnEmail = (content.length > 100) ? content.substring(0, 99) : content;
+        const contentOnEmail = (content.length > 100) ? content.substring(0, 99) + "..." : content;
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: Emails,

@@ -58,6 +58,7 @@ model Comment{
   post                  News           @relation(fields: [post_id], references: [id])
   commenter_name        String  
   comment_description   String   
+  likes                 Int
   created_at            DateTime       @default(now())
   updated_at            DateTime       @default(now())
 }

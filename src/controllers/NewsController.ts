@@ -215,6 +215,22 @@ export class NewsController{
                     }
                 }
             })
+
+            const comments = await prisma.comment.findMany({
+                where:{
+                    post_id: Number(id)
+                }, 
+                orderBy:[
+                    {
+                        likes: 'desc'
+                    }
+                ],
+                take: 50,
+                select:{
+                    commenter_name: true,
+                    comment_description: true
+                }
+            })
         
             if(!news){
                 res.status(404).json({
@@ -226,7 +242,8 @@ export class NewsController{
             const News = NewsTransform.Transform(news);
         
             res.status(200).json({
-                News
+                News,
+                comments: comments == null ? 0 : comments
             })
             return;
         } catch (error) {
