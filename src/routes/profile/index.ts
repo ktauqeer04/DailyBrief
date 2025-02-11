@@ -5,8 +5,8 @@ import { Router } from "express";
 const router = Router();
 
 
-router.put('/profile/:id', authMiddleware, ProfileController.update);
-router.get('/profile/:id', authMiddleware, ProfileController.show);
-router.delete('/profile/:id', authMiddleware, ProfileController.remove);
+router.put('/:id', authMiddleware, ProfileController.update);
+router.get('/:id', authMiddleware, ProfileController.show);
+router.delete('/:id', authMiddleware, ProfileController.remove);
 
 export default router;

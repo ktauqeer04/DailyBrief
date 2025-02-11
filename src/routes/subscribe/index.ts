@@ -5,7 +5,7 @@ import { Router } from "express";
 
 const router = Router();
 
-router.post('/v1/subscribe', authMiddleware, SubscribeController.subscribe);
+router.post('/subscribe', authMiddleware, SubscribeController.subscribe);
 
 
 export default router;

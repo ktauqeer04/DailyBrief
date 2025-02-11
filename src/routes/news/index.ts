@@ -4,12 +4,12 @@ import { Router } from "express";
 
 const router = Router();
 
-router.post('/news/post', authMiddleware, NewsController.store);
-router.get('/news/fetch', NewsController.Fetch);
-router.get('/news/fetch/:id', NewsController.show);
-router.put('/news/update/:id', NewsController.update);
-router.delete('/news/delete/:id', authMiddleware, NewsController.remove);
-router.post('/news/save', authMiddleware, NewsController.SavePost);
-router.get('/news/savedpost', authMiddleware, NewsController.getSavedPost)
+router.post('/post', authMiddleware, NewsController.store);
+router.get('/fetch', NewsController.Fetch);
+router.get('/fetch/:id', NewsController.show);
+router.put('/update/:id', NewsController.update);
+router.delete('/delete/:id', authMiddleware, NewsController.remove);
+router.post('/save', authMiddleware, NewsController.SavePost);
+router.get('/savedpost', authMiddleware, NewsController.getSavedPost)
 
 export default router;

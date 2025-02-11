@@ -5,8 +5,8 @@ import { commentController } from "../../controllers/commentController";
 const router = Router();
 
 
-router.post('/news/comment', authMiddleware, commentController.commentPost)
-router.post('/news/comment/likes', authMiddleware, commentController.likes);
+router.post('/', authMiddleware, commentController.commentPost)
+router.post('/likes', authMiddleware, commentController.likes);
 
 
 export default router;
