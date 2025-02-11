@@ -66,8 +66,6 @@ class NewsController {
             const { title, content } = req.body;
             //@ts-ignore
             const userid = req.user.id;
-            // console.log(`id is ${userid}`);
-            // console.log({title, content});
             const validate = (0, errorHandling_1.ValidateNews)({ title, content });
             if (validate.isError) {
                 res.status(400).json({
@@ -88,7 +86,7 @@ class NewsController {
                 });
                 return;
             }
-            const imageFunction = (0, imgConfig_1.imageValidationAndUpload)(image);
+            const imageFunction = await (0, imgConfig_1.imageValidationAndUpload)(image);
             if (!imageFunction.success) {
                 res.status(400).json({
                     error: imageFunction.message
@@ -159,6 +157,7 @@ class NewsController {
                     id: Number(id)
                 },
                 select: {
+                    id: true,
                     title: true,
                     image: true,
                     author: {
@@ -239,7 +238,7 @@ class NewsController {
                     });
                     return;
                 }
-                const imageFunction = (0, imgConfig_1.imageValidationAndUpload)(image);
+                const imageFunction = await (0, imgConfig_1.imageValidationAndUpload)(image);
                 imageName = imageFunction.message;
                 if (!imageFunction.success) {
                     res.status(400).json({
@@ -284,6 +283,7 @@ class NewsController {
             console.error(error);
         }
     }
+    //delete post
     static async remove(req, res) {
         try {
             const { id } = req.params;
@@ -314,6 +314,64 @@ class NewsController {
             res.status(200).json({
                 message: `News of ${Number(id)} id deleted Successfully`
             });
+            return;
+        }
+        catch (error) {
+            res.status(500);
+            console.error(error);
+        }
+    }
+    // hit api end point to save post
+    static async SavePost(req, res) {
+        try {
+            const { postId } = req.body;
+            //@ts-ignore
+            const { id } = req.user;
+            await db_1.prisma.savePost.create({
+                data: {
+                    post_id: Number(postId),
+                    user_id: Number(id)
+                }
+            });
+            res.status(200).json({
+                message: "Post saved Succcessfully"
+            });
+            return;
+        }
+        catch (error) {
+            res.status(500);
+            console.error(error);
+        }
+    }
+    //hit api end point to get all the saved post
+    static async getSavedPost(req, res) {
+        try {
+            //@ts-ignore
+            const { id } = req.user;
+            const firstTenPost = await db_1.prisma.savePost.findMany({
+                where: {
+                    user_id: id
+                },
+                include: {
+                    post: {
+                        select: {
+                            id: true,
+                            title: true,
+                            content: true,
+                            image: true,
+                            created_at: true,
+                        },
+                    }
+                },
+                orderBy: {
+                    created_at: 'desc', // Optional: Order by the most recently saved posts
+                },
+                take: 10,
+            });
+            res.status(200).json({
+                firstTenPost
+            });
+            return;
         }
         catch (error) {
             res.status(500);

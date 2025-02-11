@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { ValidateRegister } from "../utils/errorHandling";
 import bcrypt from "bcrypt";
 import { prisma } from "../db";
@@ -147,17 +147,14 @@ class AuthController{
     }
 
 
-    static async    verifyEmail(req: Request,  res: Response){
+    static async verifyEmail(req: Request,  res: Response){
 
         const token  = String(req.query.token);
 
         try{
 
             const decode = jwt.verify(token, process.env.JWT_SECRET || "") as JwtPayload;
-            
             const email = decode.email;            
-
-        
             const user = await prisma.people.findFirst({where:{email}});
 
             if (!user || user.verification_token !== token) {

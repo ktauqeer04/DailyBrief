@@ -1,6 +1,6 @@
 import express = require('express'); //! import express from 'express';
 import dotenv from 'dotenv';
-import router from './routers/api';
+import router from './routes/api';
 import fileUpload from 'express-fileupload';
 import path from "path";
 import cors from "cors";

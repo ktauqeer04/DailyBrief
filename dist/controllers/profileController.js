@@ -61,7 +61,7 @@ class ProfileController {
                 });
                 return;
             }
-            const imageFunction = (0, imgConfig_1.imageValidationAndUpload)(profile);
+            const imageFunction = await (0, imgConfig_1.imageValidationAndUpload)(profile);
             if (!imageFunction.success) {
                 res.status(400).json({
                     error: imageFunction.message
