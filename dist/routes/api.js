@@ -37,32 +37,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = __importStar(require("express"));
-const authController_1 = __importDefault(require("../controllers/authController"));
-const AuthMiddleware_1 = __importDefault(require("../middlewares/AuthMiddleware"));
-const profileController_1 = require("../controllers/profileController");
-const NewsController_1 = require("../controllers/NewsController");
-const subsController_1 = require("../controllers/subsController");
-const commentController_1 = require("../controllers/commentController");
-// import {ProfileController} from "../controllers/profileController";
+const auth_1 = __importDefault(require("./auth"));
+const comment_1 = __importDefault(require("./comment"));
+const news_1 = __importDefault(require("./news"));
+const profile_1 = __importDefault(require("./profile"));
+const subscribe_1 = __importDefault(require("./subscribe"));
 const router = express.Router();
-router.post('/auth/register', authController_1.default.register);
-router.post('/auth/login', authController_1.default.login);
-router.get('/auth/verify-email', authController_1.default.verifyEmail);
-//profile Routes
-router.put('/profile/:id', AuthMiddleware_1.default, profileController_1.ProfileController.update);
-router.get('/profile/:id', AuthMiddleware_1.default, profileController_1.ProfileController.show);
-router.delete('/profile/:id', AuthMiddleware_1.default, profileController_1.ProfileController.remove);
+//auth Routes
+router.use('/auth', auth_1.default);
+//profie routes
+router.use('/profile', profile_1.default);
 // news routes
-router.post('/news/post', AuthMiddleware_1.default, NewsController_1.NewsController.store);
-router.get('/news/fetch', NewsController_1.NewsController.Fetch);
-router.get('/news/fetch/:id', NewsController_1.NewsController.show);
-router.put('/news/update/:id', NewsController_1.NewsController.update);
-router.delete('/news/delete/:id', AuthMiddleware_1.default, NewsController_1.NewsController.remove);
-router.post('/news/save', AuthMiddleware_1.default, NewsController_1.NewsController.SavePost);
-router.get('/news/savedpost', AuthMiddleware_1.default, NewsController_1.NewsController.getSavedPost);
+router.use('/news', news_1.default);
 // subscribe route
-router.post('/v1/subscribe', AuthMiddleware_1.default, subsController_1.SubscribeController.subscribe);
+router.use('/v1', subscribe_1.default);
 //comment route
-router.post('/news/comment', AuthMiddleware_1.default, commentController_1.commentController.commentPost);
-router.post('/news/comment/likes', AuthMiddleware_1.default, commentController_1.commentController.likes);
+router.use('/news/comment', comment_1.default);
 exports.default = router;

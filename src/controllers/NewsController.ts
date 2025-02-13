@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { ValidateNews } from "../utils/errorHandling";
-import { imageValidationAndUpload, removeImage } from "../utils/imgConfig";
+import { ValidateNews } from "../utils/customResponse/errorHandling";
+import { imageValidationAndUpload, removeImage } from "../utils/config/imgConfig";
 import { prisma } from "../db";
 import { News, NewsTransform } from "../transform/newsTransform";
 import { notificationQueue, redis } from "../queue/worker"

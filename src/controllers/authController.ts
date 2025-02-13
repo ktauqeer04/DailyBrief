@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ValidateRegister } from "../utils/errorHandling";
+import { ValidateRegister } from "../utils/customResponse/errorHandling";
 import bcrypt from "bcrypt";
 import { prisma } from "../db";
 import jwt, { JwtPayload } from "jsonwebtoken";

@@ -1,4 +1,4 @@
-import { defautlImageURL, getProfileImageURL } from "../utils/imgConfig";
+import { defautlImageURL, getProfileImageURL } from "../utils/config/imgConfig";
 
 export interface News{
     id?: number,

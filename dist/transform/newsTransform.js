@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsTransform = void 0;
-const imgConfig_1 = require("../utils/imgConfig");
+const imgConfig_1 = require("../utils/config/imgConfig");
 class NewsTransform {
     static Transform(news) {
         return {

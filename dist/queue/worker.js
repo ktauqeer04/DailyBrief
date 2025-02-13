@@ -39,7 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.notificationWorker = exports.notificationQueue = exports.emailQueue = exports.redis = exports.connection = void 0;
 const bullmq_1 = require("bullmq");
 const dotenv = __importStar(require("dotenv"));
-const emailConfig_1 = require("../utils/emailConfig");
+const emailConfig_1 = require("../utils/config/emailConfig");
 dotenv.config();
 const bullmq_2 = require("bullmq");
 const ioredis_1 = __importDefault(require("ioredis"));

@@ -1,4 +1,4 @@
-import { newsSchema, userSchema } from "./zodValidation";
+import { newsSchema, userSchema } from "../validations/zodValidation";
 
 
 interface UserRegister{

@@ -1,6 +1,6 @@
 import { tryCatch, Worker } from "bullmq";
 import * as dotenv from "dotenv";
-import { sendNotificationEmail, sendVerificationEmail } from "../utils/emailConfig";
+import { sendNotificationEmail, sendVerificationEmail } from "../utils/config/emailConfig";
 dotenv.config();
 import { Queue } from "bullmq";
 import Redis from "ioredis";

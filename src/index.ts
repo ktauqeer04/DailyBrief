@@ -5,7 +5,7 @@ import fileUpload from 'express-fileupload';
 import path from "path";
 import cors from "cors";
 import helmet from 'helmet';
-import { limiter } from './utils/rateLimiter';
+import { limiter } from './utils/security/rateLimiter';
 
 dotenv.config()
 

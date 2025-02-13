@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsController = void 0;
-const errorHandling_1 = require("../utils/errorHandling");
-const imgConfig_1 = require("../utils/imgConfig");
+const errorHandling_1 = require("../utils/customResponse/errorHandling");
+const imgConfig_1 = require("../utils/config/imgConfig");
 const db_1 = require("../db");
 const newsTransform_1 = require("../transform/newsTransform");
 const worker_1 = require("../queue/worker");

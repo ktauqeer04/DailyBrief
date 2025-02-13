@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProfileController = void 0;
-const imgConfig_1 = require("../utils/imgConfig");
+const imgConfig_1 = require("../utils/config/imgConfig");
 const db_1 = require("../db");
 class ProfileController {
     // static async fetch(req: Request, res: Response){

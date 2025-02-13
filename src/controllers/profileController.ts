@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { imageValidationAndUpload } from "../utils/imgConfig";
+import { imageValidationAndUpload } from "../utils/config/imgConfig";
 import { prisma } from "../db";
 
 export class ProfileController{
