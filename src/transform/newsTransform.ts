@@ -1,4 +1,4 @@
-import { defautlImageURL, getProfileImageURL } from "../utils/config/imgConfig";
+import { ImageHelper } from "../utils";
 
 export interface News{
     id?: number,
@@ -21,12 +21,12 @@ export class NewsTransform{
             id: news.id,
             title: news.title,
             content: news.content,
-            image: getProfileImageURL(news.image),
+            image: ImageHelper.getProfileImageURL(news.image),
             created_at: news.created_at,
             author:{
                 id: news.author.id,
                 name: news.author.name,
-                profile: news.author.profile !== null ? getProfileImageURL(news.author.profile) : defautlImageURL("defaultImage.webp")
+                profile: news.author.profile !== null ? ImageHelper.getProfileImageURL(news.author.profile) : ImageHelper.defautlImageURL("defaultImage.webp")
             }
         }
 

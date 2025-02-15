@@ -3,16 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const errorHandling_1 = require("../utils/customResponse/errorHandling");
+const utils_1 = require("../utils");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const db_1 = require("../db");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const worker_1 = require("../queue/worker");
 class AuthController {
     static async register(req, res) {
         try {
             const { name, email, password } = req.body;
-            const validate = (0, errorHandling_1.ValidateRegister)({ name, email, password });
+            const validate = utils_1.Validation.ValidateRegister({ name, email, password });
             if (validate.isError) {
                 res.status(422).json({
                     error: validate.error
@@ -49,7 +48,7 @@ class AuthController {
                 };
                 const token = jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET || "");
                 console.log(`before email worker`);
-                await worker_1.emailQueue.add('project01-verify-email', {
+                await utils_1.Queue.emailQueue.add('project01-verify-email', {
                     email: email,
                     token: token
                 });

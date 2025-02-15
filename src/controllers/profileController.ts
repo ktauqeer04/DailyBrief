@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { imageValidationAndUpload } from "../utils/config/imgConfig";
+import { ImageHelper } from "../utils";
 import { prisma } from "../db";
 
 export class ProfileController{
@@ -88,7 +88,7 @@ export class ProfileController{
                 return;
             }
             
-            const imageFunction = await imageValidationAndUpload(profile);
+            const imageFunction = await ImageHelper.imageValidationAndUpload(profile);
 
             if(!imageFunction.success){
                 res.status(400).json({

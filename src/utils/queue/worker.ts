@@ -1,9 +1,12 @@
-import { tryCatch, Worker } from "bullmq";
+import { Worker } from "bullmq";
 import * as dotenv from "dotenv";
-import { sendNotificationEmail, sendVerificationEmail } from "../utils/config/emailConfig";
-dotenv.config();
+import { sendNotificationEmail, sendVerificationEmail } from "../config/emailConfig";
 import { Queue } from "bullmq";
 import Redis from "ioredis";
+
+
+dotenv.config();
+
 
 // export const redis = new Redis({
 //     username: 'default',
@@ -18,7 +21,7 @@ const redisConfig = {
     maxRetriesPerRequest: null
 }
 
-export const connection = new Redis(redisConfig);
+const connection = new Redis(redisConfig);
 export const redis = new Redis(redisConfig)
 
 connection.on('connect', () => {

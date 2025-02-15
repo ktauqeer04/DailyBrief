@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
-import { ValidateNews } from "../utils/customResponse/errorHandling";
-import { imageValidationAndUpload, removeImage } from "../utils/config/imgConfig";
+import { Validation, ImageHelper, Queue } from "../utils/";
 import { prisma } from "../db";
 import { News, NewsTransform } from "../transform/newsTransform";
-import { notificationQueue, redis } from "../queue/worker"
 
 export class NewsController{
 
@@ -18,7 +16,7 @@ export class NewsController{
             
             const cacheKey = `news:page=${page}`
 
-            const cachedData = await redis.get(cacheKey);
+            const cachedData = await Queue.redis.get(cacheKey);
 
             if(cachedData){
                 console.log("Serving from cache");
@@ -55,7 +53,7 @@ export class NewsController{
             const totalPages = Math.ceil(totalNews / limit);
 
             const cacheValue = JSON.stringify({ transformedNews, totalPages });
-            await redis.set(cacheKey, cacheValue, "EX", 420); 
+            await Queue.redis.set(cacheKey, cacheValue, "EX", 420); 
 
 
     
@@ -85,7 +83,7 @@ export class NewsController{
             //@ts-ignore
             const userid = req.user.id;
             
-            const validate = ValidateNews({title, content});
+            const validate = Validation.ValidateNews({title, content});
             
             if(validate.isError){
                 res.status(400).json({
@@ -110,7 +108,7 @@ export class NewsController{
                 return;
             }
 
-            const imageFunction = await imageValidationAndUpload(image);
+            const imageFunction = await ImageHelper.imageValidationAndUpload(image);
 
             if(!imageFunction.success){
                 res.status(400).json({
@@ -137,10 +135,10 @@ export class NewsController{
             const page = Math.ceil(id/10);
 
             const cacheKey = `news:page=${page}`;
-            const cachedData = await redis.get(cacheKey);
+            const cachedData = await Queue.redis.get(cacheKey);
 
             if(cachedData){
-                await redis.del(cacheKey);
+                await Queue.redis.del(cacheKey);
                 console.log(`Cache key deleted successfully`);
             }
 
@@ -296,7 +294,7 @@ export class NewsController{
                     return;
                 }
 
-                const imageFunction = await imageValidationAndUpload(image);
+                const imageFunction = await ImageHelper.imageValidationAndUpload(image);
                 imageName = imageFunction.message
 
                 if(!imageFunction.success){
@@ -309,11 +307,11 @@ export class NewsController{
                 // validation done
                 // remove old image 
                 console.log(news.image);
-                removeImage(news.image);
+                ImageHelper.removeImage(news.image);
 
             }
             
-            const validate = ValidateNews({title, content});
+            const validate = Validation.ValidateNews({title, content});
 
             if(validate.isError){
                 console.error(validate.error);
@@ -333,10 +331,10 @@ export class NewsController{
 
             const page = Math.ceil(news.id/10);
             const cacheKey = `news:page=${page}`;
-            const cachedData = await redis.get(cacheKey);
+            const cachedData = await Queue.redis.get(cacheKey);
 
             if(cachedData){
-                await redis.del(cacheKey);
+                await Queue.redis.del(cacheKey);
                 console.log(`Cache key deleted successfully`);
             }
 

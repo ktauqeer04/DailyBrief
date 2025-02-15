@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProfileController = void 0;
-const imgConfig_1 = require("../utils/config/imgConfig");
+const utils_1 = require("../utils");
 const db_1 = require("../db");
 class ProfileController {
     // static async fetch(req: Request, res: Response){
@@ -61,7 +61,7 @@ class ProfileController {
                 });
                 return;
             }
-            const imageFunction = await (0, imgConfig_1.imageValidationAndUpload)(profile);
+            const imageFunction = await utils_1.ImageHelper.imageValidationAndUpload(profile);
             if (!imageFunction.success) {
                 res.status(400).json({
                     error: imageFunction.message

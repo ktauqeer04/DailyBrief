@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
-import { ValidateRegister } from "../utils/customResponse/errorHandling";
+import { Validation, Queue } from "../utils";
 import bcrypt from "bcrypt";
 import { prisma } from "../db";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { emailQueue } from "../queue/worker"
 
 class AuthController{
 
@@ -12,7 +11,7 @@ class AuthController{
         try{
 
             const { name, email, password } = req.body;
-            const validate = ValidateRegister({name, email, password});
+            const validate = Validation.ValidateRegister({ name, email, password });
 
             if(validate.isError){
 
@@ -59,7 +58,7 @@ class AuthController{
                 
                 console.log(`before email worker`);
                 
-                await emailQueue.add('project01-verify-email', {
+                await Queue.emailQueue.add('project01-verify-email', {
                     email: email,
                     token: token
                 })

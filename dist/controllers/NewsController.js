@@ -1,11 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsController = void 0;
-const errorHandling_1 = require("../utils/customResponse/errorHandling");
-const imgConfig_1 = require("../utils/config/imgConfig");
+const utils_1 = require("../utils/");
 const db_1 = require("../db");
 const newsTransform_1 = require("../transform/newsTransform");
-const worker_1 = require("../queue/worker");
 class NewsController {
     static async Fetch(req, res) {
         try {
@@ -14,7 +12,7 @@ class NewsController {
             const skip = (page - 1) * limit;
             console.log(`page is ${page}, limit is ${limit}, skip is ${skip}`);
             const cacheKey = `news:page=${page}`;
-            const cachedData = await worker_1.redis.get(cacheKey);
+            const cachedData = await utils_1.Queue.redis.get(cacheKey);
             if (cachedData) {
                 console.log("Serving from cache");
                 const { transformedNews, totalPages } = JSON.parse(cachedData);
@@ -45,7 +43,7 @@ class NewsController {
             const totalNews = await db_1.prisma.people.count();
             const totalPages = Math.ceil(totalNews / limit);
             const cacheValue = JSON.stringify({ transformedNews, totalPages });
-            await worker_1.redis.set(cacheKey, cacheValue, "EX", 420);
+            await utils_1.Queue.redis.set(cacheKey, cacheValue, "EX", 420);
             res.status(200).json({
                 message: transformedNews,
                 metaData: {
@@ -66,7 +64,7 @@ class NewsController {
             const { title, content } = req.body;
             //@ts-ignore
             const userid = req.user.id;
-            const validate = (0, errorHandling_1.ValidateNews)({ title, content });
+            const validate = utils_1.Validation.ValidateNews({ title, content });
             if (validate.isError) {
                 res.status(400).json({
                     error: validate.error
@@ -86,7 +84,7 @@ class NewsController {
                 });
                 return;
             }
-            const imageFunction = await (0, imgConfig_1.imageValidationAndUpload)(image);
+            const imageFunction = await utils_1.ImageHelper.imageValidationAndUpload(image);
             if (!imageFunction.success) {
                 res.status(400).json({
                     error: imageFunction.message
@@ -106,9 +104,9 @@ class NewsController {
             const id = news.id;
             const page = Math.ceil(id / 10);
             const cacheKey = `news:page=${page}`;
-            const cachedData = await worker_1.redis.get(cacheKey);
+            const cachedData = await utils_1.Queue.redis.get(cacheKey);
             if (cachedData) {
-                await worker_1.redis.del(cacheKey);
+                await utils_1.Queue.redis.del(cacheKey);
                 console.log(`Cache key deleted successfully`);
             }
             const Emails = await db_1.prisma.subscription.findMany({
@@ -131,7 +129,7 @@ class NewsController {
             //@ts-ignore
             // console.log(req.user.name);
             // console.log(Emails);
-            await worker_1.notificationQueue.add('project01-news-notification', {
+            await notificationQueue.add('project01-news-notification', {
                 title,
                 content,
                 //@ts-ignore
@@ -238,7 +236,7 @@ class NewsController {
                     });
                     return;
                 }
-                const imageFunction = await (0, imgConfig_1.imageValidationAndUpload)(image);
+                const imageFunction = await utils_1.ImageHelper.imageValidationAndUpload(image);
                 imageName = imageFunction.message;
                 if (!imageFunction.success) {
                     res.status(400).json({
@@ -249,9 +247,9 @@ class NewsController {
                 // validation done
                 // remove old image 
                 console.log(news.image);
-                (0, imgConfig_1.removeImage)(news.image);
+                utils_1.ImageHelper.removeImage(news.image);
             }
-            const validate = (0, errorHandling_1.ValidateNews)({ title, content });
+            const validate = utils_1.Validation.ValidateNews({ title, content });
             if (validate.isError) {
                 console.error(validate.error);
                 return;
@@ -268,9 +266,9 @@ class NewsController {
             });
             const page = Math.ceil(news.id / 10);
             const cacheKey = `news:page=${page}`;
-            const cachedData = await worker_1.redis.get(cacheKey);
+            const cachedData = await utils_1.Queue.redis.get(cacheKey);
             if (cachedData) {
-                await worker_1.redis.del(cacheKey);
+                await utils_1.Queue.redis.del(cacheKey);
                 console.log(`Cache key deleted successfully`);
             }
             res.status(200).json({
