@@ -13,7 +13,7 @@ export interface News{
     }
 }
 
-export class NewsTransform{
+class NewsTransform{
 
     static Transform(news: News){
 
@@ -28,8 +28,11 @@ export class NewsTransform{
                 name: news.author.name,
                 profile: news.author.profile !== null ? ImageHelper.getProfileImageURL(news.author.profile) : ImageHelper.defautlImageURL("defaultImage.webp")
             }
+            
         }
 
     }
 
 }
+
+export default NewsTransform;

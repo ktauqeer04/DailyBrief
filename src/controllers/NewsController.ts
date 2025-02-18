@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Validation, ImageHelper, Queue } from "../utils/";
 import { prisma } from "../db";
-import { News, NewsTransform } from "../transform/newsTransform";
+import NewsTransform, { News } from "../transform/newsTransform";
 
 export class NewsController{
 
