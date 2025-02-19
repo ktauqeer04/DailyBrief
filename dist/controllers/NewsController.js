@@ -1,9 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NewsController = void 0;
 const utils_1 = require("../utils/");
 const db_1 = require("../db");
-const newsTransform_1 = require("../transform/newsTransform");
+const newsTransform_1 = __importDefault(require("../transform/newsTransform"));
 class NewsController {
     static async Fetch(req, res) {
         try {
@@ -39,7 +42,7 @@ class NewsController {
                 },
                 take: limit
             });
-            const transformedNews = allNews.map((item) => newsTransform_1.NewsTransform.Transform(item));
+            const transformedNews = allNews.map((item) => newsTransform_1.default.Transform(item));
             const totalNews = await db_1.prisma.people.count();
             const totalPages = Math.ceil(totalNews / limit);
             const cacheValue = JSON.stringify({ transformedNews, totalPages });
@@ -188,7 +191,7 @@ class NewsController {
                 });
                 return;
             }
-            const News = newsTransform_1.NewsTransform.Transform(news);
+            const News = newsTransform_1.default.Transform(news);
             res.status(200).json({
                 News,
                 comments: comments == null ? 0 : comments

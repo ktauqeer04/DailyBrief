@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { Validation, Queue } from "../utils";
 import bcrypt from "bcrypt";
-import { prisma } from "../db";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { findUser, registerUser, updateUser } from "../service/authService";
 
 class AuthController{
 
@@ -25,27 +25,21 @@ class AuthController{
                 const salt = await bcrypt.genSalt(10);
                 const hashedPassword = await bcrypt.hash(password, salt);
                 
-                const findUser = await prisma.people.findFirst({
-                    where:{
-                        email
-                    }
-                })
+                const findIfUserExists = await findUser({name, email, password});
 
-                if(findUser){
+                if(findIfUserExists){
                     res.status(422).json({
                         message: "Email already exists. please Login"
                     })
                     return;
                 }
 
-                const user = await prisma.people.create({
-                    data: {
-                        name,
-                        email,
-                        password: hashedPassword,
-                    }
-                })
+                const user = await registerUser({ name, email, password: hashedPassword });
 
+                if (!user) {
+                    throw new Error("User registration failed"); 
+                }
+                
                 // console.log(user.id);
                 const payload  = {
                     id: user.id,
@@ -62,12 +56,15 @@ class AuthController{
                     email: email,
                     token: token
                 })
-
-                await prisma.people.update({
-                    where: { id: user.id },
+                
+                const id = user.id;
+                await updateUser({ 
+                    where: {
+                        id: id
+                    }, 
                     data: {
-                        verification_token: token
-                    }
+                        verification_token : token
+                    } 
                 });
 
         
@@ -93,14 +90,9 @@ class AuthController{
 
             const {email, password} = req.body;
             // first verifying whether the email exists
-            const findUser = await prisma.people.findFirst({
-                where: {
-                    email,
-                    is_verified: true
-                }
-            })
+            const findIfUserExists = await findUser({ email, is_verified: true});
 
-            if(!findUser){
+            if(!findIfUserExists){
                 res.status(404).json({
                     message:"User doesn't Exists. Please Register"
                 })
@@ -109,7 +101,7 @@ class AuthController{
 
             // verify passsword
 
-            const verify = await bcrypt.compare(password, findUser.password);
+            const verify = await bcrypt.compare(password, findIfUserExists.password);
 
             if(!verify){
                 res.status(404).json({
@@ -121,10 +113,10 @@ class AuthController{
             //issue token to the user
 
             const payload  = {
-                id: findUser.id,
-                name: findUser.name,
-                email: findUser.email,
-                profile: findUser?.profile
+                id: findIfUserExists.id,
+                name: findIfUserExists.name,
+                email: findIfUserExists.email,
+                profile: findIfUserExists?.profile
             }
             
             // console.log(`secret is ${process.env.JWT_SECRET}`);
@@ -154,21 +146,23 @@ class AuthController{
 
             const decode = jwt.verify(token, process.env.JWT_SECRET || "") as JwtPayload;
             const email = decode.email;            
-            const user = await prisma.people.findFirst({where:{email}});
+            const user = await findUser({ email });
 
             if (!user || user.verification_token !== token) {
                 return res.status(400).json({ error: 'Invalid or expired token.' });
             }
 
-            await prisma.people.update({
-                where: { email },
+            await updateUser({ 
+                where: {
+                    email: email
+                }, 
                 data: {
-                  is_verified: true,
-                  verification_token: null,
-                },
-              });
+                    is_verified: true, verification_token: null
+                }
+            });
+
           
-              res.status(200).json({ message: 'Email verified successfully.' });
+            res.status(200).json({ message: 'Email verified successfully.' });
 
         }catch(error){
             res.status(500).json({

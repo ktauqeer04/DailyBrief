@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NewsTransform = void 0;
 const utils_1 = require("../utils");
 class NewsTransform {
     static Transform(news) {
@@ -18,4 +17,4 @@ class NewsTransform {
         };
     }
 }
-exports.NewsTransform = NewsTransform;
+exports.default = NewsTransform;

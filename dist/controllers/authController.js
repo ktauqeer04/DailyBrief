@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("../utils");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const db_1 = require("../db");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const authService_1 = require("../service/authService");
 class AuthController {
     static async register(req, res) {
         try {
@@ -21,25 +21,17 @@ class AuthController {
             else {
                 const salt = await bcrypt_1.default.genSalt(10);
                 const hashedPassword = await bcrypt_1.default.hash(password, salt);
-                const findUser = await db_1.prisma.people.findFirst({
-                    where: {
-                        email
-                    }
-                });
-                if (findUser) {
+                const findIfUserExists = await (0, authService_1.findUser)({ name, email, password });
+                if (findIfUserExists) {
                     res.status(422).json({
                         message: "Email already exists. please Login"
                     });
                     return;
                 }
-                const user = await db_1.prisma.people.create({
-                    data: {
-                        name,
-                        email,
-                        password: hashedPassword,
-                    }
-                });
-                // console.log(user.id);
+                const user = await (0, authService_1.registerUser)({ name, email, password: hashedPassword });
+                if (!user) {
+                    throw new Error("User registration failed");
+                }
                 const payload = {
                     id: user.id,
                     name: user.name,
@@ -52,12 +44,8 @@ class AuthController {
                     email: email,
                     token: token
                 });
-                await db_1.prisma.people.update({
-                    where: { id: user.id },
-                    data: {
-                        verification_token: token
-                    }
-                });
+                const id = user.id;
+                await (0, authService_1.updateUser)({ id, token });
                 res.status(200).json({
                     message: "Email sent Successfully",
                     token: `Bearer ${token}`
@@ -76,20 +64,15 @@ class AuthController {
         try {
             const { email, password } = req.body;
             // first verifying whether the email exists
-            const findUser = await db_1.prisma.people.findFirst({
-                where: {
-                    email,
-                    is_verified: true
-                }
-            });
-            if (!findUser) {
+            const findIfUserExists = await (0, authService_1.findUser)({ email, is_verified: true });
+            if (!findIfUserExists) {
                 res.status(404).json({
                     message: "User doesn't Exists. Please Register"
                 });
                 return;
             }
             // verify passsword
-            const verify = await bcrypt_1.default.compare(password, findUser.password);
+            const verify = await bcrypt_1.default.compare(password, findIfUserExists.password);
             if (!verify) {
                 res.status(404).json({
                     message: "Incorrect Password"
@@ -98,10 +81,10 @@ class AuthController {
             }
             //issue token to the user
             const payload = {
-                id: findUser.id,
-                name: findUser.name,
-                email: findUser.email,
-                profile: findUser?.profile
+                id: findIfUserExists.id,
+                name: findIfUserExists.name,
+                email: findIfUserExists.email,
+                profile: findIfUserExists?.profile
             };
             // console.log(`secret is ${process.env.JWT_SECRET}`);
             const token = jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET || "");
@@ -123,17 +106,16 @@ class AuthController {
         try {
             const decode = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || "");
             const email = decode.email;
-            const user = await db_1.prisma.people.findFirst({ where: { email } });
+            const user = await (0, authService_1.findUser)({ email });
             if (!user || user.verification_token !== token) {
                 return res.status(400).json({ error: 'Invalid or expired token.' });
             }
-            await db_1.prisma.people.update({
-                where: { email },
-                data: {
-                    is_verified: true,
-                    verification_token: null,
-                },
-            });
+            await (0, authService_1.updateUser)({ email, is_verified: true, verification_token: null });
+            // where: { email },
+            //     data: {
+            //       is_verified: true,
+            //       verification_token: null,
+            // },
             res.status(200).json({ message: 'Email verified successfully.' });
         }
         catch (error) {

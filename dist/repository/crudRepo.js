@@ -1,15 +1,11 @@
-import { Prisma } from "@prisma/client";
-import { PrismaClient } from "@prisma/client/extension";
-
-
-class crudRepository<T> {
-
-    model: PrismaClient
-
-    constructor(){
-        this.model = new PrismaClient();
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const extension_1 = require("@prisma/client/extension");
+class crudRepository {
+    model;
+    constructor() {
+        this.model = new extension_1.PrismaClient();
     }
-
     // async getSpecific(id: number){
     //     const getThisSpecific = await this.model.findUnique({
     //         where: {
@@ -29,21 +25,12 @@ class crudRepository<T> {
     //         }
     //     })
     // }
-
-    async getAll(){
-
+    async getAll() {
     }
-
-    async create(){
-
+    async create() {
     }
-
-    async delete(){
-
+    async delete() {
     }
-
-    async update(){
-
+    async update() {
     }
-
 }
