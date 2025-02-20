@@ -1,4 +1,5 @@
 import { PrismaClient, People } from "@prisma/client";
+import { findUsers, register, updateUser1, updateUser2 } from "../types/authTypes/types";
 
 const prisma = new PrismaClient();
 
@@ -10,7 +11,7 @@ export class AuthRepository {
         this.model = model;
     }
 
-    async register(data: any) {
+    async register(data: register) {
 
         const response = await this.model.create({
             data: data
@@ -20,7 +21,8 @@ export class AuthRepository {
 
     }
 
-    async findUser(data: any) {
+    async find(data: findUsers) {
+
         const user = await this.model.findFirst({
             where: data
         })
@@ -29,7 +31,7 @@ export class AuthRepository {
     }
     
     
-    async update(data: any){  
+    async update(data: updateUser1 | updateUser2){  
 
         const whereData = data.where;
         const updateData = data.data;

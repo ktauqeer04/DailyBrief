@@ -25,7 +25,7 @@ class AuthController{
                 const salt = await bcrypt.genSalt(10);
                 const hashedPassword = await bcrypt.hash(password, salt);
                 
-                const findIfUserExists = await findUser({name, email, password});
+                const findIfUserExists = await findUser({ email });
 
                 if(findIfUserExists){
                     res.status(422).json({
@@ -152,15 +152,20 @@ class AuthController{
                 return res.status(400).json({ error: 'Invalid or expired token.' });
             }
 
-            await updateUser({ 
+            const update = await updateUser({ 
+
                 where: {
                     email: email
                 }, 
                 data: {
                     is_verified: true, verification_token: null
                 }
+
             });
 
+            if(!update){
+                res.status(400).json({ message: 'Something went wrong, please try again later....' });
+            }
           
             res.status(200).json({ message: 'Email verified successfully.' });
 
