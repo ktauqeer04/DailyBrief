@@ -2,9 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateUser = exports.findUser = exports.registerUser = void 0;
 const authRepo_1 = require("../repository/authRepo");
-const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
-const authRepository = new authRepo_1.AuthRepository(prisma.people);
+const db_1 = require("../db");
+const authRepository = new authRepo_1.AuthRepository(db_1.prisma.people);
 const registerUser = async (data) => {
     try {
         const createUser = await authRepository.register(data);

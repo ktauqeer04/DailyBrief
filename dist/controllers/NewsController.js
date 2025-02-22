@@ -7,6 +7,7 @@ exports.NewsController = void 0;
 const utils_1 = require("../utils/");
 const db_1 = require("../db");
 const newsTransform_1 = __importDefault(require("../transform/newsTransform"));
+const newsService_1 = require("../service/newsService");
 class NewsController {
     static async Fetch(req, res) {
         try {
@@ -29,7 +30,7 @@ class NewsController {
                 });
                 return;
             }
-            const allNews = await db_1.prisma.news.findMany({
+            const allNews = await (0, newsService_1.findAllNews)({
                 skip: skip,
                 include: {
                     author: {
@@ -42,6 +43,12 @@ class NewsController {
                 },
                 take: limit
             });
+            if (!allNews || allNews.length == 0) {
+                res.status(400).json({
+                    message: "Cannot Fetch News"
+                });
+                return;
+            }
             const transformedNews = allNews.map((item) => newsTransform_1.default.Transform(item));
             const totalNews = await db_1.prisma.people.count();
             const totalPages = Math.ceil(totalNews / limit);
@@ -65,12 +72,14 @@ class NewsController {
     static async store(req, res) {
         try {
             const { title, content } = req.body;
+            console.log(req.body);
             //@ts-ignore
             const userid = req.user.id;
             const validate = utils_1.Validation.ValidateNews({ title, content });
             if (validate.isError) {
+                console.log(validate.error);
                 res.status(400).json({
-                    error: validate.error
+                    error: validate.error,
                 });
                 return;
             }
@@ -90,7 +99,7 @@ class NewsController {
             const imageFunction = await utils_1.ImageHelper.imageValidationAndUpload(image);
             if (!imageFunction.success) {
                 res.status(400).json({
-                    error: imageFunction.message
+                    error: imageFunction.message,
                 });
                 return;
             }
@@ -132,7 +141,7 @@ class NewsController {
             //@ts-ignore
             // console.log(req.user.name);
             // console.log(Emails);
-            await notificationQueue.add('project01-news-notification', {
+            await utils_1.Queue.notificationQueue.add('project01-news-notification', {
                 title,
                 content,
                 //@ts-ignore
@@ -153,7 +162,7 @@ class NewsController {
     static async show(req, res) {
         try {
             const id = req.params.id;
-            const news = await db_1.prisma.news.findUnique({
+            const news = await db_1.prisma.news.findFirst({
                 where: {
                     id: Number(id)
                 },
@@ -170,7 +179,7 @@ class NewsController {
                     }
                 }
             });
-            const comments = await db_1.prisma.comment.findMany({
+            const comments = await (0, newsService_1.findAllNews)({
                 where: {
                     post_id: Number(id)
                 },
@@ -290,7 +299,7 @@ class NewsController {
             const { id } = req.params;
             //@ts-ignore
             const userid = req.user.id;
-            const news = await db_1.prisma.news.findFirst({
+            const news = await (0, newsService_1.findById)({
                 where: {
                     id: Number(id)
                 }
@@ -349,7 +358,7 @@ class NewsController {
         try {
             //@ts-ignore
             const { id } = req.user;
-            const firstTenPost = await db_1.prisma.savePost.findMany({
+            const firstTenPost = await (0, newsService_1.findAllNews)({
                 where: {
                     user_id: id
                 },
@@ -365,7 +374,7 @@ class NewsController {
                     }
                 },
                 orderBy: {
-                    created_at: 'desc', // Optional: Order by the most recently saved posts
+                    created_at: 'desc',
                 },
                 take: 10,
             });

@@ -10,9 +10,9 @@ class NewsTransform {
             image: utils_1.ImageHelper.getProfileImageURL(news.image),
             created_at: news.created_at,
             author: {
-                id: news.author.id,
-                name: news.author.name,
-                profile: news.author.profile !== null ? utils_1.ImageHelper.getProfileImageURL(news.author.profile) : utils_1.ImageHelper.defautlImageURL("defaultImage.webp")
+                id: news.author?.id,
+                name: news.author?.name,
+                profile: news.author && news.author.profile !== null ? utils_1.ImageHelper.getProfileImageURL(news.author.profile) : utils_1.ImageHelper.defautlImageURL("defaultImage.webp")
             }
         };
     }

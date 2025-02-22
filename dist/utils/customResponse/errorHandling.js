@@ -20,7 +20,7 @@ function ValidateRegister(inputs) {
 function ValidateNews(inputs) {
     const validate = zodValidation_1.newsSchema.safeParse(inputs);
     if (!validate.success) {
-        const error = validate.error.errors[0].message;
+        const error = "Invalid Title or Content";
         return {
             isError: true,
             error: error,
