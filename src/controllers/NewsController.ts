@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Validation, ImageHelper, Queue } from "../utils/";
 import { prisma } from "../db";
 import NewsTransform, { News } from "../transform/newsTransform";
+import { findById, findAllNews } from "../service/newsService";
 
 export class NewsController{
 
@@ -33,7 +34,7 @@ export class NewsController{
                 return;
             }
 
-            const allNews = await prisma.news.findMany({
+            const allNews = await findAllNews({
                 skip: skip,
                 include:{
                     author: {
@@ -45,8 +46,16 @@ export class NewsController{
                     }
                 },
                 take: limit
-            });
+            }) ;
+
+            if(!allNews || allNews.length == 0){
+                res.status(400).json({
+                    message: "Cannot Fetch News"
+                })
+                return;
+            }
     
+            
             const transformedNews = allNews.map((item : News) => NewsTransform.Transform(item));
 
             const totalNews = await prisma.people.count();
@@ -79,15 +88,17 @@ export class NewsController{
     static async store(req: Request, res: Response){
 
         try{
-            const {title, content} = req.body;
+            const { title, content } = req.body;
+            console.log(req.body);
             //@ts-ignore
             const userid = req.user.id;
             
             const validate = Validation.ValidateNews({title, content});
             
             if(validate.isError){
+                console.log(validate.error);
                 res.status(400).json({
-                    error: validate.error
+                    error: validate.error,
                 })
                 return;
             }
@@ -112,7 +123,7 @@ export class NewsController{
 
             if(!imageFunction.success){
                 res.status(400).json({
-                    error: imageFunction.message
+                    error: imageFunction.message,
                 })
                 return;
             }
@@ -157,10 +168,15 @@ export class NewsController{
             })
 
             const EmailArray: Array<string> = [];
-            Emails.map((data) => {
+
+
+            Emails!.map((data) => {
+                
                 EmailArray.push(data.user.email)
                 // console.log(data.user.email);
             })
+
+
 
             //@ts-ignore
             // console.log(req.user.name);
@@ -168,7 +184,7 @@ export class NewsController{
 
             // console.log(Emails);
 
-            await notificationQueue.add('project01-news-notification',{
+            await Queue.notificationQueue.add('project01-news-notification',{
                 title,
                 content,
                 //@ts-ignore
@@ -194,7 +210,7 @@ export class NewsController{
     static async show(req: Request, res: Response){
         try {
             const id = req.params.id;
-            const news = await prisma.news.findUnique({
+            const news = await prisma.news.findFirst({
                 where:{
                     id: Number(id)
                 },
@@ -212,7 +228,7 @@ export class NewsController{
                 }
             })
 
-            const comments = await prisma.comment.findMany({
+            const comments = await findAllNews({
                 where:{
                     post_id: Number(id)
                 }, 
@@ -226,7 +242,7 @@ export class NewsController{
                     commenter_name: true,
                     comment_description: true
                 }
-            })
+            });
         
             if(!news){
                 res.status(404).json({
@@ -353,17 +369,19 @@ export class NewsController{
 
     //delete post
     static async remove(req: Request, res: Response){
+        
         try {
+
             const { id } = req.params;
 
             //@ts-ignore
             const userid = req.user.id;
 
-            const news = await prisma.news.findFirst({
+            const news = await findById({
                 where:{
                     id: Number(id)
                 }
-            })
+            });
 
             if(!news){
                 res.status(404).json({
@@ -402,7 +420,7 @@ export class NewsController{
             
             const { postId } = req.body;
             //@ts-ignore
-            const {id} = req.user;
+            const { id } = req.user;
             
             await prisma.savePost.create({
                 data:{
@@ -433,7 +451,7 @@ export class NewsController{
             //@ts-ignore
             const {id} = req.user;
             
-            const firstTenPost = await prisma.savePost.findMany({
+            const firstTenPost = await findAllNews({
                 where:{
                     user_id: id
                 },
@@ -449,7 +467,7 @@ export class NewsController{
                     }
                 },
                 orderBy: {
-                    created_at: 'desc', // Optional: Order by the most recently saved posts
+                    created_at: 'desc', 
                 },
                 take: 10,
             })

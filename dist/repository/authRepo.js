@@ -14,22 +14,20 @@ class AuthRepository {
         });
         return response;
     }
-    async findUser(data) {
+    async find(data) {
         const user = await this.model.findFirst({
             where: data
         });
         return user;
     }
     async update(data) {
-        const { id, token } = data;
+        const whereData = data.where;
+        const updateData = data.data;
         const response = await this.model.update({
-            where: {
-                id: id
-            },
-            data: {
-                verification_token: token
-            }
+            where: whereData,
+            data: updateData
         });
+        return response;
     }
 }
 exports.AuthRepository = AuthRepository;

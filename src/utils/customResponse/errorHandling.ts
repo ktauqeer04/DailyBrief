@@ -30,7 +30,7 @@ export function ValidateRegister(inputs: UserRegister){
 export function ValidateNews(inputs: News){
     const validate = newsSchema.safeParse(inputs);
     if(!validate.success){
-        const error = validate.error.errors[0].message;
+        const error = "Invalid Title or Content";
         return {
             isError: true,
             error: error,

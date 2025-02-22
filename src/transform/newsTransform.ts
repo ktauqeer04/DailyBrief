@@ -6,7 +6,7 @@ export interface News{
     content?: string,
     image: string,
     created_at?: Date,
-    author: {
+    author?: {
         id: number,
         name: string,
         profile: string | null
@@ -24,9 +24,9 @@ class NewsTransform{
             image: ImageHelper.getProfileImageURL(news.image),
             created_at: news.created_at,
             author:{
-                id: news.author.id,
-                name: news.author.name,
-                profile: news.author.profile !== null ? ImageHelper.getProfileImageURL(news.author.profile) : ImageHelper.defautlImageURL("defaultImage.webp")
+                id: news.author?.id,
+                name: news.author?.name,
+                profile: news.author && news.author.profile !== null ? ImageHelper.getProfileImageURL(news.author.profile) : ImageHelper.defautlImageURL("defaultImage.webp")
             }
             
         }

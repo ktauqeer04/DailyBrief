@@ -21,7 +21,7 @@ class AuthController {
             else {
                 const salt = await bcrypt_1.default.genSalt(10);
                 const hashedPassword = await bcrypt_1.default.hash(password, salt);
-                const findIfUserExists = await (0, authService_1.findUser)({ name, email, password });
+                const findIfUserExists = await (0, authService_1.findUser)({ email });
                 if (findIfUserExists) {
                     res.status(422).json({
                         message: "Email already exists. please Login"
@@ -32,6 +32,7 @@ class AuthController {
                 if (!user) {
                     throw new Error("User registration failed");
                 }
+                // console.log(user.id);
                 const payload = {
                     id: user.id,
                     name: user.name,
@@ -45,7 +46,14 @@ class AuthController {
                     token: token
                 });
                 const id = user.id;
-                await (0, authService_1.updateUser)({ id, token });
+                await (0, authService_1.updateUser)({
+                    where: {
+                        id: id
+                    },
+                    data: {
+                        verification_token: token
+                    }
+                });
                 res.status(200).json({
                     message: "Email sent Successfully",
                     token: `Bearer ${token}`
@@ -110,12 +118,17 @@ class AuthController {
             if (!user || user.verification_token !== token) {
                 return res.status(400).json({ error: 'Invalid or expired token.' });
             }
-            await (0, authService_1.updateUser)({ email, is_verified: true, verification_token: null });
-            // where: { email },
-            //     data: {
-            //       is_verified: true,
-            //       verification_token: null,
-            // },
+            const update = await (0, authService_1.updateUser)({
+                where: {
+                    email: email
+                },
+                data: {
+                    is_verified: true, verification_token: null
+                }
+            });
+            if (!update) {
+                res.status(400).json({ message: 'Something went wrong, please try again later....' });
+            }
             res.status(200).json({ message: 'Email verified successfully.' });
         }
         catch (error) {

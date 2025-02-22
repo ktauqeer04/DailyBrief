@@ -17,7 +17,7 @@ const registerUser = async (data) => {
 exports.registerUser = registerUser;
 const findUser = async (data) => {
     try {
-        const findthisUser = await authRepository.findUser(data);
+        const findthisUser = await authRepository.find(data);
         return findthisUser;
     }
     catch (error) {
@@ -27,6 +27,7 @@ const findUser = async (data) => {
 exports.findUser = findUser;
 const updateUser = async (data) => {
     try {
+        console.log(data);
         const updateThisUser = await authRepository.update(data);
         return updateThisUser;
     }

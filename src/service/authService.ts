@@ -1,10 +1,10 @@
 import { AuthRepository } from "../repository/authRepo"
-import { PrismaClient } from "@prisma/client";
 import { findUsers, register, updateUser1, updateUser2 } from "../types/authTypes/types";
-
-const prisma = new PrismaClient();
+import { prisma } from "../db";
 
 const authRepository = new AuthRepository(prisma.people);
+
+
 
 export const registerUser = async (data: register) => {
     try {
